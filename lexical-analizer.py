@@ -260,21 +260,23 @@ class LexicalAnalizer():
 
                                     if self.q221:
                                         buffer = buffer + symbol
-                                        buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.ART.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
-                                        self.q221 = False
-                                        self.q21 = False
-                                        self.q2 = False
+                                        if (buffer == "++"):
+                                            buffer = self.writeIdentifiedToken(
+                                                Token(Acronym.ART.value, buffer, lineCount),
+                                                buffer,
+                                                symbol
+                                            )
+                                            self.q221 = False
+                                            self.q21 = False
+                                            self.q2 = False
 
                                 if self.q22:
-                                    if line[symbolCount+1] == "-" and not self.q222:
-                                        self.q221 = True
-                                    elif line[symbolCount+1] == ">" and not self.q221:
-                                        self.q222 = True
-                                    else:
+                                    if not len(line) == symbolCount+1:
+                                        if line[symbolCount+1] == "-" and not self.q222 and not self.q221:
+                                            self.q221 = True
+                                        elif line[symbolCount+1] == ">" and not self.q221 and not self.q222:
+                                            self.q222 = True
+                                    if (not self.q222 and not self.q221) and (len(line) == symbolCount+1 or symbol == "-"):
                                         buffer = buffer + symbol
                                         buffer = self.writeIdentifiedToken(
                                             Token(Acronym.ART.value, buffer, lineCount),
@@ -286,25 +288,27 @@ class LexicalAnalizer():
 
                                     if self.q221:
                                         buffer = buffer + symbol
-                                        buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.ART.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
-                                        self.q221 = False
-                                        self.q22 = False
-                                        self.q2 = False
+                                        if buffer == "--":
+                                            buffer = self.writeIdentifiedToken(
+                                                Token(Acronym.ART.value, buffer, lineCount),
+                                                buffer,
+                                                symbol
+                                            )
+                                            self.q221 = False
+                                            self.q22 = False
+                                            self.q2 = False
 
                                     if self.q222:
                                         buffer = buffer + symbol
-                                        buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.DEL.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
-                                        self.q222 = False
-                                        self.q22 = False
-                                        self.q2 = False
+                                        if(buffer == "->"):
+                                            buffer = self.writeIdentifiedToken(
+                                                Token(Acronym.DEL.value, buffer, lineCount),
+                                                buffer,
+                                                symbol
+                                            )
+                                            self.q222 = False
+                                            self.q22 = False
+                                            self.q2 = False
 
                                 if self.q23:
                                     if line[symbolCount+1] == "/" and not self.q232:
@@ -335,11 +339,20 @@ class LexicalAnalizer():
                                         self.q2 = False
                                 
                             if self.q3:
-                                if line[symbolCount+1] == "=" and not self.q32:
-                                    self.q31 = True
-                                elif (symbol == "&" or symbol == "|") and not self.q31:
-                                    self.q32 = True
-                                elif not self.q31 and not self.q32:
+                                if not len(line) == symbolCount+1:
+                                    if line[symbolCount+1] == "=" and not self.q32 and not self.q31:
+                                        self.q31 = True
+                                    elif (symbol == "&" or symbol == "|") and not self.q31 and not self.q32:
+                                        self.q32 = True
+                                    elif not self.q31 and not self.q32:
+                                        buffer = buffer + symbol
+                                        buffer = self.writeIdentifiedToken(
+                                            Token(Acronym.LOG.value, buffer, lineCount),
+                                            buffer,
+                                            symbol
+                                        )
+                                        self.q3 = False
+                                elif not self.q32 and not self.q31:
                                     buffer = buffer + symbol
                                     buffer = self.writeIdentifiedToken(
                                         Token(Acronym.LOG.value, buffer, lineCount),
@@ -350,13 +363,14 @@ class LexicalAnalizer():
 
                                 if self.q31:
                                     buffer = buffer + symbol
-                                    buffer = self.writeIdentifiedToken(
-                                        Token(Acronym.REL.value, buffer, lineCount),
-                                        buffer,
-                                        symbol
-                                    )
-                                    self.q31 = False
-                                    self.q3 = False
+                                    if buffer == "!=":
+                                        buffer = self.writeIdentifiedToken(
+                                            Token(Acronym.REL.value, buffer, lineCount),
+                                            buffer,
+                                            symbol
+                                        )
+                                        self.q31 = False
+                                        self.q3 = False
 
                                 if self.q32:
                                     buffer = buffer + symbol
@@ -370,9 +384,18 @@ class LexicalAnalizer():
                                         self.q3 = False
                             
                             if self.q4:
-                                if line[symbolCount+1] == "=":
-                                    self.q41 = True
-                                else:
+                                if not len(line) == symbolCount+1 and not self.q41:
+                                    if line[symbolCount+1] == "=":
+                                        self.q41 = True
+                                    else:
+                                        buffer = buffer + symbol
+                                        buffer = self.writeIdentifiedToken(
+                                        Token(Acronym.REL.value, buffer, lineCount),
+                                        buffer,
+                                        symbol
+                                    )
+                                    self.q4 = False
+                                elif not self.q41:
                                     buffer = buffer + symbol
                                     buffer = self.writeIdentifiedToken(
                                         Token(Acronym.REL.value, buffer, lineCount),
@@ -381,15 +404,16 @@ class LexicalAnalizer():
                                     )
                                     self.q4 = False
                                 
-                                if self.q41:
+                                if self.q41:                                  
                                     buffer = buffer + symbol
-                                    buffer = self.writeIdentifiedToken(
-                                        Token(Acronym.REL.value, buffer, lineCount),
-                                        buffer,
-                                        symbol
-                                    )
-                                    self.q41 = False
-                                    self.q4 = False
+                                    if buffer == "==":
+                                        buffer = self.writeIdentifiedToken(
+                                            Token(Acronym.REL.value, buffer, lineCount),
+                                            buffer,
+                                            symbol
+                                        )
+                                        self.q41 = False
+                                        self.q4 = False
 
                             if self.q5:
                                 if line[symbolCount+1] == "=":
