@@ -1,0 +1,25 @@
+1. <IDE, abg>
+1. <ART, ->
+1. <ART, +>
+1. <PRE, if>
+1. <DEL, .>
+1. <IDE, variablesi>
+1. <DEL, {>
+1. <DEL, .>
+1. <NRO, 1.0>
+2. <DEL, ;>
+2. <IDE, v>
+2. <DEL, .>
+2. <NRO, 1>
+2. <IDE, a5_a>
+2. <IDE, JH1>
+2. <DEL, )>
+2. <DEL, (>
+2. <CAC, "&&&">
+3. <LOG, ||>
+3. <NRO, 111>
+3. <IDE, consta>
+9. <LOG, !>
+9. <CAC, "isso e uma cadeia*&">
+10. <DEL, }>
+10. <DEL, }>

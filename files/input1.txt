@@ -1,0 +1,10 @@
+abg-+if.variablesi { .1.0
+;v. 1 a5_a JH1)("&&&"
+||111 consta // comentário
+/* 
+ bloco
+ de
+ comentário
+*/
+! "isso e uma cadeia*&"
+}}
