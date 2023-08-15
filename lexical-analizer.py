@@ -101,7 +101,7 @@ class LexicalAnalizer():
         #self.q81 = False # Se for ", então é fechada.
         #self.q82 = False #Se for letra, digito ou simbolo então é incremetado, se não é ignorado.
 
-        self.q9 = False #Se for * e o próximo simbolo for /, então terminou o comentario de bloco.
+        #self.q9 = False #Se for * e o próximo simbolo for /, então terminou o comentario de bloco.
 
         self.commentLine = False
         self.commentBlock = False
@@ -119,7 +119,7 @@ class LexicalAnalizer():
                     symbolCount = 0
                     for symbol in line:
                         if not self.commentLine and not self.commentBlock:
-                            #Existe algum estado ativo? se não, eu poosso começar a determinar o meu estado atual #falta clausula comentario
+                            #Existe algum estado ativo? se não, começar a determinar o estado atual
                             if not (self.q0 or self.q1 or self.q2 or self.q3 or self.q4 or self.q5 or self.q6 or self.q7 or self.q8) :
                                 if re.search(wordRegx, symbol):
                                     self.q0 = True
