@@ -125,8 +125,8 @@ class LexicalAnalizer():
                 self.outputFile = open(self.filesPath + "/" + dir.split(".")[0] + "_output.txt", "w", encoding="utf8")
                 lineCount = 1
                 print(dir)
-                for line in self.inputFile.readlines():
-                    buffer = ""
+                buffer = ""
+                for line in self.inputFile.readlines():                    
                     symbolCount = 0
                     for symbol in line:
                         if not self.commentLine and not self.commentBlock:
@@ -396,7 +396,7 @@ class LexicalAnalizer():
                                                     self.q11 = False
                                                     self.q1 = False
 
-                                            if line[symbolCount+1] in separatorForNumbers and (len(buffer.split(".")) == 2 and not buffer.split(".")[1] == '') or (len(buffer.split(".")) > 2 and not self.q114):
+                                            if line[symbolCount+1] in separatorForNumbers and (len(buffer.split(".")) == 2 and not buffer.split(".")[1] == '') or (len(buffer.split(".")) > 2 and line[symbolCount+1] in separatorForNumbers):
                                                 buffer = self.writeIdentifiedToken(
                                                             Token(Acronym.NMF.value, buffer, lineCount),
                                                             buffer,
@@ -455,7 +455,6 @@ class LexicalAnalizer():
                                     self.q22 = True
                                 if symbol == "/" and not self.q22 and not self.q21:
                                     self.q23 = True
-
                                 
                                 if self.q21:
                                     if len(line) == symbolCount+1: 
@@ -815,11 +814,14 @@ class LexicalAnalizer():
                         if self.commentLine:
                             if symbol == "\n":
                                 self.commentLine = False
+                                buffer = ""
 
                         if self.commentBlock: 
                             buffer = buffer + symbol
+                                
                             if buffer.endswith("*/"):
                                 self.commentBlock = False
+                                buffer = ""
 
                         if self.q8 or self.q81:
                             if len(line) > symbolCount+1:
@@ -842,6 +844,13 @@ class LexicalAnalizer():
 
                         symbolCount += 1
                     lineCount += 1
+                if self.commentBlock:
+                    buffer = self.writeIdentifiedToken(
+                                Token(Acronym.COMF.value, buffer, lineCount),
+                                buffer,
+                                symbol
+                            )
+                    self.commentBlock = False
                 self.outputFile.close()
                 self.inputFile.close()
 
