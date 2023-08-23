@@ -446,6 +446,7 @@ class LexicalAnalizer():
                                     self.q1 = False
                                     
                                     self.q8 = True
+                            
                             if self.q2:
                                 if symbol in ("+", "*") and not self.q22 and not self.q23:
                                     self.q21 = True
