@@ -41,9 +41,7 @@ quote = ['"']
 others = ["\n"]
 
 separatorForNumbers = [";", ",", "(", ")", "[", "]", "{", "}", " "] + logList + relList + artList + quote + others
-sepatorForTMF = delList + logList + relList + artList + quote + others
-separatorForIDE = delList + logList + relList + artList + quote + others
-separatorForLog = delList + logList + relList + artList + quote + others
+separatorForTMFIDELOG = delList + logList + relList + artList + quote + others
 
 class Acronym(Enum):
     PRE  = "PRE"    #palavra reservada
@@ -173,7 +171,7 @@ class LexicalAnalizer():
                                             )
                                         self.q0 = False
                                     elif len(line) > symbolCount+1:
-                                        if line[symbolCount+1] in separatorForIDE:
+                                        if line[symbolCount+1] in separatorForTMFIDELOG:
                                             if buffer in preList:
                                                 buffer = self.writeIdentifiedToken(
                                                     Token(Acronym.PRE.value, buffer, lineCount),
@@ -194,7 +192,7 @@ class LexicalAnalizer():
                                 if self.q01:
                                     buffer = buffer + symbol
                                     if len(line) > symbolCount+1:
-                                        if line[symbolCount+1] in sepatorForTMF:
+                                        if line[symbolCount+1] in separatorForTMFIDELOG:
                                             buffer = self.writeIdentifiedToken(
                                                         Token(Acronym.IMF.value, buffer, lineCount),
                                                         buffer,
@@ -640,7 +638,7 @@ class LexicalAnalizer():
                   
                                     if self.q321:
                                         if len(line) > symbolCount+1:
-                                            if line[symbolCount+1] in separatorForLog and (not (buffer == "&" or buffer == "|") or line[symbolCount+1] == " "):
+                                            if line[symbolCount+1] in separatorForTMFIDELOG and (not (buffer == "&" or buffer == "|") or line[symbolCount+1] == " "):
                                                 buffer = self.writeIdentifiedToken(
                                                         Token(Acronym.TMF.value, buffer, lineCount),
                                                         buffer,
@@ -796,7 +794,7 @@ class LexicalAnalizer():
                             if self.q9:
                                 buffer = buffer + symbol
                                 if len(line) > symbolCount+1:
-                                    if line[symbolCount+1] in sepatorForTMF:
+                                    if line[symbolCount+1] in separatorForTMFIDELOG:
                                         buffer = self.writeIdentifiedToken(
                                                     Token(Acronym.TMF.value, buffer, lineCount),
                                                     buffer,
