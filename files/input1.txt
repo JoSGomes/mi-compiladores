@@ -1,9 +1,96 @@
-teste /\\\
+class &&jfbfd849_523"*zxcfdsf-45hdghf5+/o"
+! read
+g64ndf423--||
+k765w4hdf void+87465343; ==&&
+"657hgffgh7{]"]!= ->
 
-%$# &
+int a = 3;
+int b = 6;
 
-teste
+double result=a*b // resultado
 
-const 
+int main(int argc, char argv)
+{
+    if (sodium_init() < 0) {
+        cout << "Error on libsodium init!\n";
+        return -1;
+    }
+    QApplication a(argc, argv);
+    shoyu w;
+    w.show();
+    return a.exec();
+}
 
-for 
+++++++++++
+>++++++++++++++++++++++++++++++++++++++++++++++++
+>++++++++++
+[
+
+  >++++++++++++++++++++++++++++++++++++++++++++++++
+  >++++++++++
+  [
+
+	  >++++++++++++++++++++++++++++++++++++++++++++++++
+	  >++++++++++
+	  [
+	    <<<<<
+	    >>
+	    >>+
+	    <<<<<
+	    >>>>>>-
+	  ]
+	  <----------------------------------------------------------
+
+	  <<+
+	  >-
+  ]
+  <----------------------------------------------------------
+
+  <<+
+  >
+  -
+]
+
+abg-+if.variablesi { .1.0
+;v. 1 a5_a JH1)("&&&"
+||111 consta // comentário
+/* 
+ bloco
+ de
+ comentário
+*/
+! "isso e uma cadeia*&"
+}}
+
+int main
+int a = 3 const a_2=5
+3 = 5 = a325;
+b = "string"
+
+public void connect() {
+    try {
+      printlnDebug(
+        "Trying to connect to the MQTT broker " + this.serverURI + "..."
+      );
+
+      this.mqttClient =
+        new MqttClient(
+          this.serverURI,
+          String.format("cliente_java_%d", System.currentTimeMillis()),
+          new MqttDefaultFilePersistence(System.getProperty("java.io.tmpdir"))
+        );
+
+      this.mqttClient.setCallback(this);
+      this.mqttClient.connect(mqttOptions);
+    } catch (MqttException ex) {
+      printlnDebug(
+        "Error connecting to MQTT broker " + this.serverURI + " - " + ex
+      );
+    }
+}
+
+void main() {
+    int i = 0, j = 0
+    int k = i + j
+    print(k)
+}

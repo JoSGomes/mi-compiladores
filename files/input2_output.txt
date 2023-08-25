@@ -1,3 +1,116 @@
-1. <IDE, batatas>
+1. <IDE, batatasfor>
+1. <IDE, in>
+1. <ART, +>
+1. <DEL, {>
+2. <PRE, int>
+2. <REL, =>
+2. <NRO, 2>
+2. <ART, *>
+2. <LOG, !>
+3. <IDE, float>
+3. <IDE, ab>
+3. <REL, =>
+3. <ART, *>
+4. <PRE, string>
+4. <IDE, teste>
+4. <CAC, "teste">
+4. <REL, =>
+4. <CAC, "teste">
+6. <PRE, int>
+6. <IDE, resultado>
+6. <REL, =>
+6. <ART, ->
+6. <IDE, ab>
+7. <DEL, }>
+9. <REL, =>
+9. <REL, =>
+9. <NRO, 3>
+11. <PRE, int>
+11. <REL, =>
+20. <DEL, .>
+20. <NRO, 2>
+30. <ART, +>
+30. <NRO, 9>
+31. <REL, =>
+31. <NRO, 5>
+33. <DEL, .>
+33. <NRO, 99>
+33. <DEL, ;>
+33. <IDE, numb>
+35. <NRO, 4025>
+35. <CAC, "origin*&/op">
+36. <IDE, y25>
+36. <CAC, "ib34@%!(H">
+37. <IDE, sofjv>
+37. <ART, *>
+38. <ART, ->
+38. <NRO, 47>
+45. <IDE, mal>
+46. <IDE, f>
+47. <IDE, o>
+48. <IDE, r>
+49. <IDE, m>
+50. <IDE, a>
+51. <IDE, d>
+52. <IDE, a>
+58. <DEL, ]>
+58. <DEL, [>
 
- ############ Arquivo foi analisado com sucesso! ############
+ ############ Erros encontrados ############
+
+1. <NMF, 3..variavel>
+1. <NMF, 893..variables>
+2. <IMF, ab@>
+2. <NMF, 1.1.1.>
+3. <NMF, 1. >
+3. <NMF, 9.0.0>
+6. <NMF, 3.+aa>
+9. <NMF, 3.3.3.3@1@a>
+9. <NMF, 5a@n>
+11. <IMF, a@a@a@a>
+11. <CMF, "Árvore">
+13. <NMF, 3..................2>
+16. <NMF, 2..2>
+16. <NMF, 2.......>
+16. <NMF, 2.@>
+16. <NMF, 2.a>
+16. <NMF, 2.2.2>
+16. <NMF, 2.+asdas>
+20. <TMF, @as>
+20. <TMF, #$@$>
+20. <TMF, @>
+20. <TMF, @#>
+23. <IMF, as@>
+26. <CMF, "asdasdas 212038yu890 ja0j)*)UY)* @J) >
+30. <NMF, 8.1.2>
+31. <IMF, test@test>
+33. <NMF, 6.a35>
+33. <TMF, &>
+34. <TMF, |abc28>
+35. <NMF, 07084.!>
+35. <TMF, &>
+37. <TMF, %ao>
+38. <NMF, 923.<>
+40. <NMF, 2.2.>
+41. <IMF, variavel$>
+42. <IMF, v@riavel_>
+43. <NMF, 8aaa>
+44. <CMF, "cadeia de caracteres >
+54. <NMF, 9..abc>
+55. <TMF, |>
+55. <TMF, &>
+55. <TMF, |id_789>
+56. <NMF, 3.4.5.>
+57. <NMF, 1.,2>
+59. <NMF, 1nt>
+71. <COMF, /*
+
+3....+1 156.+hji, 7!1
+Aaa$eof56&_. const abc
+A+1 "isso é uma cadeia errada"
+& aeo_ just 15.3.2.1; //cheio de erro
+" não vou fechar isso
+/*
+Isso não é um comentário de bloco
+*
+Jksjsjsksksjsksks>

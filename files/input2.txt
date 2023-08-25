@@ -1,1 +1,70 @@
-batatas
+batatasfor 3..variavel in 893..variables+  {
+	int ab@ = 2 * 1.1.1.!
+	float ab = 1. * 9.0.0
+	string teste"teste" = "teste"
+
+	int resultado = 3.+aa-ab //resultado
+}
+
+3.3.3.3@1@a=5a@n=3
+
+int a@a@a@a = "Árvore"
+
+3..................2
+
+// erro numero:
+2..2 2....... 2.@ 2.a 2.2.2 2.+asdas
+// .2 é erro?
+
+// erro token
+@as #$@$ @.2 @#
+
+// erro identificador
+as@ 
+
+// erro cadia mal formada
+"asdasdas 212038yu890 ja0j)*)UY)* @J) 
+
+// erro comentario mal formador
+
+8.1.2+9
+test@test = 5
+
+6.a35&.99; numb /*teste
+proc*/ |abc28
+07084.!& 4025"origin*&/op"
+y25"ib34@%!(H" 
+sofjv*%ao
+923.<-47
+
+2.2. 
+variavel$
+v@riavel_ 
+8aaa
+"cadeia de caracteres 
+mal 
+f
+o
+r
+m
+a
+d
+a 
+
+9..abc
+|&|id_789
+3.4.5.
+1.,2
+][
+1nt
+/*
+
+3....+1 156.+hji, 7!1
+Aaa$eof56&_. const abc
+A+1 "isso é uma cadeia errada"
+& aeo_ just 15.3.2.1; //cheio de erro
+" não vou fechar isso
+/*
+Isso não é um comentário de bloco
+*
+Jksjsjsksksjsksks

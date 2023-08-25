@@ -239,7 +239,7 @@ class LexicalAnalizer():
                                             else:
                                                 self.q113 = True
 
-                                        if line[symbolCount+1] in (relList + artList + delList + logList) or not re.search(digRegex, symbol) and not self.q112 and not self.q113:
+                                        if line[symbolCount+1] in (relList + artList + delList + logList) or (not re.search(digRegex, symbol) and not symbol == ".") and not self.q112 and not self.q113:
                                             self.q114 = True
 
                                         if (re.search(digRegex, symbol) or symbol == ".") and not self.q112 and not self.q113 and not self.q114:
@@ -686,9 +686,9 @@ class LexicalAnalizer():
                     self.commentBlock = False
 
                 if len(self.errors) == 0:
-                    self.outputFile.write("\n ############ Arquivo foi analisado com sucesso! ############")
+                    self.outputFile.write("\n############ Arquivo foi analisado com sucesso! ############")
                 else:
-                    self.outputFile.write("\n ############ Erros encontrados ############\n\n")
+                    self.outputFile.write("\n############ Erros encontrados ############\n\n")
                     for error in self.errors:
                         self.writeIdentifiedToken(error)
                     
