@@ -691,6 +691,8 @@ class LexicalAnalizer():
                     self.outputFile.write("\n ############ Erros encontrados ############\n\n")
                     for error in self.errors:
                         self.writeIdentifiedToken(error)
+                    
+                    self.errors = []
 
                 self.outputFile.close()
                 self.inputFile.close()

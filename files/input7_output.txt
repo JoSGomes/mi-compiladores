@@ -2,11 +2,4 @@
 1. <IDE, a>
 1. <IDE, batata>
 
- ############ Erros encontrados ############
-
-1. <TMF, \\\>
-3. <TMF, %$#>
-3. <TMF, &>
-1. <IMF, até>
-1. <IMF, pressão>
-1. <IMF, pressão>
+ ############ Arquivo foi analisado com sucesso! ############

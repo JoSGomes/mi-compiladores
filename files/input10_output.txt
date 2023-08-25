@@ -9,7 +9,4 @@
 
  ############ Erros encontrados ############
 
-1. <TMF, \\\>
-3. <TMF, %$#>
-3. <TMF, &>
 1. <IMF, até>
