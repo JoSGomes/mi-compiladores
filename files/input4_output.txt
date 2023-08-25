@@ -1,3 +1,10 @@
 1. <IDE, panela>
 1. <IDE, de>
+
+ ############ Erros encontrados ############
+
+1. <TMF, \\\>
+3. <TMF, %$#>
+3. <TMF, &>
+1. <IMF, até>
 1. <IMF, pressão>

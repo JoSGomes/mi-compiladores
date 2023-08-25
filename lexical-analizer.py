@@ -34,11 +34,11 @@ logList = ["!", "&", "|"] #Feito
 comList = ["/*", "*/"] #Feito
 
 delList = [";", ".", ",", "(", ")", "[", "]", "{", "}", " "] #Feito
-digRegx = re.compile('[0-9]') #Feito
-wordRegx = re.compile('[a-z]|[A-Z]') #Feito
-cadCaracRegx = re.compile(r'\w*[\u0020-\u0021]*[\u0023-\u0080]*', re.ASCII) #Feito
+digRegex = re.compile('[0-9]') #Feito
+wordRegex = re.compile('[a-z]|[A-Z]') #Feito
+cadCaracRegex = re.compile(r'\w*[\u0020-\u0021]*[\u0023-\u0080]*', re.ASCII) #Feito
 quote = ['"']
-others = ["\n"]
+others = ["\n", '\t']
 
 separatorForNumbers = [";", ",", "(", ")", "[", "]", "{", "}", " "] + logList + relList + artList + quote + others
 separatorForTMFIDELOG = delList + logList + relList + artList + quote + others
@@ -115,6 +115,8 @@ class LexicalAnalizer():
         self.commentLine = False
         self.commentBlock = False
 
+        self.errors = [] #Vetor de erros
+
     def analize(self):
         dirs = os.listdir(self.filesPath)
         for dir in dirs:
@@ -130,9 +132,9 @@ class LexicalAnalizer():
                         if not self.commentLine and not self.commentBlock:
                             #Existe algum estado ativo? se não, começar a determinar o estado atual
                             if not (self.q0 or self.q1 or self.q2 or self.q3 or self.q4 or self.q5 or self.q6 or self.q7 or self.q8 or self.q9) :
-                                if re.search(wordRegx, symbol):
+                                if re.search(wordRegex, symbol):
                                     self.q0 = True
-                                elif re.search(digRegx, symbol):
+                                elif re.search(digRegex, symbol):
                                     self.q1 = True
                                 elif symbol in artList:
                                     self.q2 = True
@@ -148,43 +150,27 @@ class LexicalAnalizer():
                                     self.q7 = True
                                 elif symbol == "\"":
                                     self.q8 = True
-                                elif re.search(cadCaracRegx, symbol).group(0) and not symbol == "\n":
+                                elif re.search(cadCaracRegex, symbol).group(0) and not symbol == "\n":
                                     self.q9 = True
 
                             if self.q0:
-                                if (re.search(wordRegx, symbol) or re.search(digRegx, symbol) or symbol == "_") and not self.q01:                                  
+                                if (re.search(wordRegex, symbol) or re.search(digRegex, symbol) or symbol == "_") and not self.q01:                                  
                                     if symbol != "\n":
                                         buffer =  buffer + symbol
                                     if len(line) == symbolCount+1:
                                         if buffer in preList:
-                                            buffer = self.writeIdentifiedToken(
-                                                Token(Acronym.PRE.value, buffer, lineCount),
-                                                buffer,
-                                                symbol
-                                            )
+                                            buffer = self.writeIdentifiedToken(Token(Acronym.PRE.value, buffer, lineCount))
                                             
                                         else:
-                                            buffer = self.writeIdentifiedToken(
-                                                Token(Acronym.IDE.value, buffer, lineCount),
-                                                buffer,
-                                                symbol
-                                            )
+                                            buffer = self.writeIdentifiedToken(Token(Acronym.IDE.value, buffer, lineCount))
                                         self.q0 = False
                                     elif len(line) > symbolCount+1:
                                         if line[symbolCount+1] in separatorForTMFIDELOG:
                                             if buffer in preList:
-                                                buffer = self.writeIdentifiedToken(
-                                                    Token(Acronym.PRE.value, buffer, lineCount),
-                                                    buffer,
-                                                    symbol
-                                                )
+                                                buffer = self.writeIdentifiedToken(Token(Acronym.PRE.value, buffer, lineCount))
                                                 
                                             else:
-                                                buffer = self.writeIdentifiedToken(
-                                                    Token(Acronym.IDE.value, buffer, lineCount),
-                                                    buffer,
-                                                    symbol
-                                                )
+                                                buffer = self.writeIdentifiedToken(Token(Acronym.IDE.value, buffer, lineCount))
                                             self.q0 = False
                                 else:
                                     self.q01 = True
@@ -193,19 +179,14 @@ class LexicalAnalizer():
                                     buffer = buffer + symbol
                                     if len(line) > symbolCount+1:
                                         if line[symbolCount+1] in separatorForTMFIDELOG:
-                                            buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.IMF.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
+                                            self.errors.append(Token(Acronym.IMF.value, buffer, lineCount))
+                                            buffer = ""
                                             self.q0 = False
                                             self.q01 = False
                                     elif len(line) == symbolCount+1:
-                                        buffer = self.writeIdentifiedToken(
-                                                    Token(Acronym.IMF.value, buffer, lineCount),
-                                                    buffer,
-                                                    symbol
-                                                )
+                                        self.errors.append(Token(Acronym.IMF.value, buffer, lineCount))
+                                        buffer = ""
+
                                         self.q0 = False
                                         self.q01 = False
                                                         
@@ -217,7 +198,7 @@ class LexicalAnalizer():
                                 elif symbol == quote[0] and not self.q11 and not self.q12 and not self.q13:
                                     self.q13 =  True
                                     
-                                elif not re.search(digRegx, symbol) and not self.q13 and not self.q11 and not self.q12:  #Próximo não é número, então ativa estado de erro
+                                elif not re.search(digRegex, symbol) and not self.q13 and not self.q11 and not self.q12:  #Próximo não é número, então ativa estado de erro
                                     self.q12 = True
 
                                 elif not self.q13 and not self.q11 and not self.q12: 
@@ -225,21 +206,27 @@ class LexicalAnalizer():
                                         if symbol != "\n":
                                             buffer = buffer + symbol
 
-                                        buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.NRO.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
+                                        buffer = self.writeIdentifiedToken(Token(Acronym.NRO.value, buffer, lineCount))
                                         self.q1 = False
                                     elif len(line) > symbolCount+1:
                                         buffer = buffer + symbol
                                         if line[symbolCount+1] in separatorForNumbers:
-                                            buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.NRO.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
-                                            self.q1 = False
+                                            if line[symbolCount+1] in ('&', '|'):
+                                                if len(line) > symbolCount+2:
+                                                    if line[symbolCount+1] == '&':
+                                                        if line[symbolCount+2] == '&':
+                                                            buffer = self.writeIdentifiedToken(Token(Acronym.NRO.value, buffer, lineCount))
+                                                            self.q1 = False
+
+                                                    else:
+                                                        if line[symbolCount+2] == '|':
+                                                            buffer = self.writeIdentifiedToken(Token(Acronym.NRO.value, buffer, lineCount))
+                                                            self.q1 = False
+                                                else:
+                                                    continue #Estado de erro será ativado na próxima iteração
+                                            else:
+                                                buffer = self.writeIdentifiedToken(Token(Acronym.NRO.value, buffer, lineCount))
+                                                self.q1 = False
                                         
                                 if self.q11:
                                     if len(line) > symbolCount+1 and not self.q111 and not self.q112 and not self.q113 and not self.q114:
@@ -252,10 +239,10 @@ class LexicalAnalizer():
                                             else:
                                                 self.q113 = True
 
-                                        if line[symbolCount+1] in (relList + artList + delList + logList) or not re.search(digRegx, symbol) and not self.q112 and not self.q113:
+                                        if line[symbolCount+1] in (relList + artList + delList + logList) or not re.search(digRegex, symbol) and not self.q112 and not self.q113:
                                             self.q114 = True
 
-                                        if (re.search(digRegx, symbol) or symbol == ".") and not self.q112 and not self.q113 and not self.q114:
+                                        if (re.search(digRegex, symbol) or symbol == ".") and not self.q112 and not self.q113 and not self.q114:
                                             buffer = buffer + symbol
                                         elif not self.q112 and not self.q113 and not self.q114:
                                             self.q111 = True
@@ -263,34 +250,20 @@ class LexicalAnalizer():
 
                                         if line[symbolCount+1] in separatorForNumbers and not self.q111 and not self.q112 and not self.q113 and not self.q114:
                                             if buffer.endswith(".") or len(buffer.split(".")) > 2:
-                                                buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.NMF.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
+                                                self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                                buffer = ""
                                             else:
-                                                buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.NRO.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
+                                                buffer = self.writeIdentifiedToken(Token(Acronym.NRO.value, buffer, lineCount))
                                             self.q11 = False
                                             self.q1 = False
 
                                     elif len(line) == symbolCount+1 and not self.q111 and not self.q112 and not self.q113 and not self.q114:
                                         buffer = buffer + symbol
-                                        if buffer.endswith(".") or len(buffer.split(".")) > 2 or re.search(wordRegx, buffer) or not re.search(cadCaracRegx, buffer):
-                                            buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.NMF.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
+                                        if buffer.endswith(".") or len(buffer.split(".")) > 2 or re.search(wordRegex, buffer) or not re.search(cadCaracRegex, buffer):
+                                            self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                            buffer = ""
                                         else:
-                                            buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.NRO.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
+                                            buffer = self.writeIdentifiedToken(Token(Acronym.NRO.value, buffer, lineCount))
                                         self.q11 = False
                                         self.q1 = False
 
@@ -298,24 +271,18 @@ class LexicalAnalizer():
                                         if len(line) > symbolCount+1:
                                             if line[symbolCount+1] in separatorForNumbers:
                                                 buffer = buffer + symbol
-                                                buffer = self.writeIdentifiedToken(
-                                                            Token(Acronym.NMF.value, buffer, lineCount),
-                                                            buffer,
-                                                            symbol
-                                                        )
+                                                self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                                buffer = ""
                                                 self.q111 = False
                                                 self.q11 = False
                                                 self.q1 = False
                                             else:
                                                 buffer = buffer + symbol
 
-                                        elif re.search(wordRegx, buffer) or re.search(cadCaracRegx, buffer):
+                                        elif re.search(wordRegex, buffer) or re.search(cadCaracRegex, buffer):
                                             buffer = buffer + symbol
-                                            buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.NMF.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
+                                            self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                            buffer = ''                                          
                                             self.q111 = False
                                             self.q11 = False
                                             self.q1 = False
@@ -324,11 +291,8 @@ class LexicalAnalizer():
                                         if len(line) > symbolCount+1:
                                             if line[symbolCount+1] in separatorForNumbers and (len(buffer.split(".")) == 2 and not buffer.split(".")[1] == '') or len(buffer.split(".")) > 2:
                                                 buffer = buffer + symbol
-                                                buffer = self.writeIdentifiedToken(
-                                                            Token(Acronym.NMF.value, buffer, lineCount),
-                                                            buffer,
-                                                            symbol
-                                                        )
+                                                self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                                buffer = ""
                                                 self.q112 = False
                                                 self.q11 = False
                                                 self.q1 = False
@@ -338,11 +302,8 @@ class LexicalAnalizer():
                                                 buffer = buffer + symbol
                                         else:
                                             buffer = buffer + symbol
-                                            buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.NMF.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
+                                            self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                            buffer = ""
                                             self.q112 = False
                                             self.q11 = False
                                             self.q1 = False
@@ -352,20 +313,14 @@ class LexicalAnalizer():
                                         buffer = buffer + symbol
                                         if len(line) > symbolCount+1:
                                             if line[symbolCount+1] in separatorForNumbers and (len(buffer.split(".")) == 2 and not buffer.split(".")[1] == '') or len(buffer.split(".")) > 2:
-                                                buffer = self.writeIdentifiedToken(
-                                                            Token(Acronym.NMF.value, buffer, lineCount),
-                                                            buffer,
-                                                            symbol
-                                                        )
+                                                self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                                buffer = ""
                                                 self.q113 = False
                                                 self.q11 = False
                                                 self.q1 = False
                                         else:
-                                            buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.NMF.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
+                                            self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                            buffer = ""
                                             self.q113 = False
                                             self.q11 = False
                                             self.q1 = False
@@ -376,39 +331,27 @@ class LexicalAnalizer():
                                             if len(line) > symbolCount+2:
                                                 if line[symbolCount+1] == "/":
                                                     if line[symbolCount+2] == "/" or line[symbolCount+2] == "*":
-                                                        buffer = self.writeIdentifiedToken(
-                                                                    Token(Acronym.NMF.value, buffer, lineCount),
-                                                                    buffer,
-                                                                    symbol
-                                                                )
+                                                        self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                                        buffer = ""
                                                         self.q114 = False
                                                         self.q11 = False
                                                         self.q1 = False
                                                 elif line[symbolCount+1] == quote[0]:
-                                                    buffer = self.writeIdentifiedToken(
-                                                                Token(Acronym.NMF.value, buffer, lineCount),
-                                                                buffer,
-                                                                symbol
-                                                            )
+                                                    self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                                    buffer = ""
                                                     self.q114 = False
                                                     self.q11 = False
                                                     self.q1 = False
 
                                             if line[symbolCount+1] in separatorForNumbers and (len(buffer.split(".")) == 2 and not buffer.split(".")[1] == '') or (len(buffer.split(".")) > 2 and line[symbolCount+1] in separatorForNumbers):
-                                                buffer = self.writeIdentifiedToken(
-                                                            Token(Acronym.NMF.value, buffer, lineCount),
-                                                            buffer,
-                                                            symbol
-                                                        )
+                                                self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                                buffer = ""
                                                 self.q114 = False
                                                 self.q11 = False
                                                 self.q1 = False
                                         else:
-                                            buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.NMF.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
+                                            self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                            buffer = ""
                                             self.q114 = False
                                             self.q11 = False
                                             self.q1 = False
@@ -416,32 +359,41 @@ class LexicalAnalizer():
                                 if self.q12:
                                     if len(line) > symbolCount+1:
                                         if line[symbolCount+1] in separatorForNumbers:
-                                            buffer = buffer + symbol
-                                            buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.NMF.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
-                                            self.q12 = False
-                                            self.q1 = False
+                                            if line[symbolCount+1] in ('&', '|'):
+                                                if len(line) > symbolCount+2:
+                                                    if line[symbolCount+1] == '&':
+                                                        if line[symbolCount+2] == '&':
+                                                            buffer = buffer + symbol
+                                                            self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                                            buffer = ""
+                                                            self.q12 = False
+                                                            self.q1 = False
+                                                    else:
+                                                        if line[symbolCount+2] == '|':
+                                                            buffer = buffer + symbol
+                                                            self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                                            buffer = ""
+                                                            self.q12 = False
+                                                            self.q1 = False
+                                                else:
+                                                    buffer = buffer + symbol
+                                            else:
+                                                buffer = buffer + symbol
+                                                self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                                buffer = ""
+                                                self.q12 = False
+                                                self.q1 = False
                                         else:
                                             buffer = buffer + symbol
                                     else:
                                         buffer = buffer + symbol
-                                        buffer = self.writeIdentifiedToken(
-                                                    Token(Acronym.NMF.value, buffer, lineCount),
-                                                    buffer,
-                                                    symbol
-                                                )
+                                        self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                        buffer = ""
                                         self.q12 = False
                                         self.q1 = False
 
                                 if self.q13:
-                                    buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.ART.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
+                                    buffer = self.writeIdentifiedToken(Token(Acronym.ART.value, buffer, lineCount))
                                     self.q13 = False
                                     self.q1 = False
                                     
@@ -458,21 +410,13 @@ class LexicalAnalizer():
                                 if self.q21:
                                     if len(line) == symbolCount+1: 
                                         buffer = buffer + symbol
-                                        buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.ART.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
+                                        buffer = self.writeIdentifiedToken(Token(Acronym.ART.value, buffer, lineCount))
                                         self.q21 = False
                                         self.q2 = False
 
                                     elif line[symbolCount+1] != "+" and not self.q221:
                                         buffer = buffer + symbol
-                                        buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.ART.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
+                                        buffer = self.writeIdentifiedToken(Token(Acronym.ART.value, buffer, lineCount))
                                         self.q21 = False
                                         self.q2 = False
                                     else:
@@ -481,11 +425,7 @@ class LexicalAnalizer():
                                     if self.q221:
                                         buffer = buffer + symbol
                                         if (buffer == "++"):
-                                            buffer = self.writeIdentifiedToken(
-                                                Token(Acronym.ART.value, buffer, lineCount),
-                                                buffer,
-                                                symbol
-                                            )
+                                            buffer = self.writeIdentifiedToken(Token(Acronym.ART.value, buffer, lineCount))
                                             self.q221 = False
                                             self.q21 = False
                                             self.q2 = False
@@ -498,22 +438,14 @@ class LexicalAnalizer():
                                             self.q222 = True
                                     if (not self.q222 and not self.q221) and (len(line) == symbolCount+1 or symbol == "-"):
                                         buffer = buffer + symbol
-                                        buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.ART.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
+                                        buffer = self.writeIdentifiedToken(Token(Acronym.ART.value, buffer, lineCount))
                                         self.q22 = False
                                         self.q2 = False
 
                                     if self.q221:
                                         buffer = buffer + symbol
                                         if buffer == "--":
-                                            buffer = self.writeIdentifiedToken(
-                                                Token(Acronym.ART.value, buffer, lineCount),
-                                                buffer,
-                                                symbol
-                                            )
+                                            buffer = self.writeIdentifiedToken(Token(Acronym.ART.value, buffer, lineCount))
                                             self.q221 = False
                                             self.q22 = False
                                             self.q2 = False
@@ -521,11 +453,7 @@ class LexicalAnalizer():
                                     if self.q222:
                                         buffer = buffer + symbol
                                         if(buffer == "->"):
-                                            buffer = self.writeIdentifiedToken(
-                                                Token(Acronym.DEL.value, buffer, lineCount),
-                                                buffer,
-                                                symbol
-                                            )
+                                            buffer = self.writeIdentifiedToken(Token(Acronym.DEL.value, buffer, lineCount))
                                             self.q222 = False
                                             self.q22 = False
                                             self.q2 = False
@@ -538,20 +466,12 @@ class LexicalAnalizer():
                                             self.q232 = True
                                         else:
                                             buffer = buffer + symbol
-                                            buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.ART.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
+                                            buffer = self.writeIdentifiedToken(Token(Acronym.ART.value, buffer, lineCount))
                                         self.q23 = False
                                         self.q2 = False
                                     elif len(line) == symbolCount+1 and not self.q232:
                                         buffer = buffer + symbol
-                                        buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.ART.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
+                                        buffer = self.writeIdentifiedToken(Token(Acronym.ART.value, buffer, lineCount))
                                         self.q23 = False
                                         self.q2 = False                                   
 
@@ -572,11 +492,7 @@ class LexicalAnalizer():
                                 if len(line) == symbolCount+1 and not self.q31 and not self.q32: 
                                     if symbol == "!":
                                         buffer = buffer + symbol
-                                        buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.LOG.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
+                                        buffer = self.writeIdentifiedToken(Token(Acronym.LOG.value, buffer, lineCount))
                                         self.q3 = False                      
                                     elif (symbol == "&" or symbol == "|"):
                                         self.q32 = True                  
@@ -587,40 +503,24 @@ class LexicalAnalizer():
                                         self.q32 = True 
                                     elif not self.q31 and not self.q32:
                                         buffer = buffer + symbol
-                                        buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.LOG.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
+                                        buffer = self.writeIdentifiedToken(Token(Acronym.LOG.value, buffer, lineCount))
                                         self.q3 = False
                                 elif not self.q32 and not self.q31:
                                     buffer = buffer + symbol
-                                    buffer = self.writeIdentifiedToken(
-                                        Token(Acronym.LOG.value, buffer, lineCount),
-                                        buffer,
-                                        symbol
-                                    )
+                                    buffer = self.writeIdentifiedToken(Token(Acronym.LOG.value, buffer, lineCount))
                                     self.q3 = False
 
                                 if self.q31:
                                     buffer = buffer + symbol
                                     if buffer == "!=":
-                                        buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.REL.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
+                                        buffer = self.writeIdentifiedToken(Token(Acronym.REL.value, buffer, lineCount))
                                         self.q31 = False
                                         self.q3 = False
 
                                 if self.q32:
                                     buffer = buffer + symbol
                                     if (buffer == "&&" or buffer == "||") and not self.q321:
-                                        buffer = self.writeIdentifiedToken(
-                                                    Token(Acronym.LOG.value, buffer, lineCount),
-                                                    buffer,
-                                                    symbol
-                                                )
+                                        buffer = self.writeIdentifiedToken(Token(Acronym.LOG.value, buffer, lineCount))
                                         self.q32 = False
                                         self.q3 = False
 
@@ -639,21 +539,15 @@ class LexicalAnalizer():
                   
                                     if self.q321:
                                         if len(line) > symbolCount+1:
-                                            if line[symbolCount+1] in separatorForTMFIDELOG and (not (buffer == "&" or buffer == "|") or line[symbolCount+1] == " "):
-                                                buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.TMF.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
+                                            if line[symbolCount+1] in separatorForTMFIDELOG:
+                                                self.errors.append(Token(Acronym.TMF.value, buffer, lineCount))
+                                                buffer = ""
                                                 self.q321 = False
                                                 self.q32 = False
                                                 self.q3 = False
                                         elif len(line) == symbolCount+1:
-                                            buffer = self.writeIdentifiedToken(
-                                                        Token(Acronym.TMF.value, buffer, lineCount),
-                                                        buffer,
-                                                        symbol
-                                                    )
+                                            self.errors.append(Token(Acronym.TMF.value, buffer, lineCount))
+                                            buffer = ""
                                             self.q321 = False
                                             self.q32 = False
                                             self.q3 = False
@@ -664,29 +558,17 @@ class LexicalAnalizer():
                                         self.q41 = True
                                     else:
                                         buffer = buffer + symbol
-                                        buffer = self.writeIdentifiedToken(
-                                        Token(Acronym.REL.value, buffer, lineCount),
-                                        buffer,
-                                        symbol
-                                    )
+                                        buffer = self.writeIdentifiedToken(Token(Acronym.REL.value, buffer, lineCount))
                                     self.q4 = False
                                 elif not self.q41:
                                     buffer = buffer + symbol
-                                    buffer = self.writeIdentifiedToken(
-                                        Token(Acronym.REL.value, buffer, lineCount),
-                                        buffer,
-                                        symbol
-                                    )
+                                    buffer = self.writeIdentifiedToken(Token(Acronym.REL.value, buffer, lineCount))
                                     self.q4 = False
                                 
                                 if self.q41:                                  
                                     buffer = buffer + symbol
                                     if buffer == "==":
-                                        buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.REL.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
+                                        buffer = self.writeIdentifiedToken(Token(Acronym.REL.value, buffer, lineCount))
                                         self.q41 = False
                                         self.q4 = False
 
@@ -695,20 +577,12 @@ class LexicalAnalizer():
                                     self.q51 = True
                                 else:
                                     buffer = buffer + symbol
-                                    buffer = self.writeIdentifiedToken(
-                                        Token(Acronym.REL.value, buffer, lineCount),
-                                        buffer,
-                                        symbol
-                                    )
+                                    buffer = self.writeIdentifiedToken(Token(Acronym.REL.value, buffer, lineCount))
                                     self.q5 = False
                                 
                                 if self.q51:
                                     buffer = buffer + symbol
-                                    buffer = self.writeIdentifiedToken(
-                                        Token(Acronym.REL.value, buffer, lineCount),
-                                        buffer,
-                                        symbol
-                                    )
+                                    buffer = self.writeIdentifiedToken(Token(Acronym.REL.value, buffer, lineCount))
                                     self.q51 = False
                                     self.q5 = False
 
@@ -717,31 +591,19 @@ class LexicalAnalizer():
                                     self.q61 = True
                                 else:
                                     buffer = buffer + symbol
-                                    buffer = self.writeIdentifiedToken(
-                                        Token(Acronym.REL.value, buffer, lineCount),
-                                        buffer,
-                                        symbol
-                                    )
+                                    buffer = self.writeIdentifiedToken(Token(Acronym.REL.value, buffer, lineCount))
                                     self.q6 = False
                                 
                                 if self.q61:
                                     buffer = buffer + symbol
-                                    buffer = self.writeIdentifiedToken(
-                                        Token(Acronym.REL.value, buffer, lineCount),
-                                        buffer,
-                                        symbol
-                                    )
+                                    buffer = self.writeIdentifiedToken(Token(Acronym.REL.value, buffer, lineCount))
                                     self.q61 = False
                                     self.q6 = False 
 
                             if self.q7:
                                 if symbol != ' ' and symbol != '\n':
                                     buffer = buffer + symbol
-                                    buffer = self.writeIdentifiedToken(
-                                        Token(Acronym.DEL.value, buffer, lineCount),
-                                        buffer,
-                                        symbol
-                                    )
+                                    buffer = self.writeIdentifiedToken(Token(Acronym.DEL.value, buffer, lineCount))
                                     self.q7 = False
 
                                 if symbol == ' ':
@@ -752,41 +614,28 @@ class LexicalAnalizer():
                                     buffer = buffer + symbol
                                 elif buffer.startswith(quote[0]) and symbol == quote[0] and buffer != quote[0] and not self.q81:
                                     buffer = buffer + symbol
-                                    buffer = self.writeIdentifiedToken(
-                                        Token(Acronym.CAC.value, buffer, lineCount),
-                                        buffer,
-                                        symbol
-                                    )
+                                    buffer = self.writeIdentifiedToken(Token(Acronym.CAC.value, buffer, lineCount))
                                     self.q8 = False
                                 
-                                elif re.search(cadCaracRegx, symbol).group(0) and symbol != quote[0] and not self.q81:
+                                elif re.search(cadCaracRegex, symbol).group(0) and symbol != quote[0] and not self.q81:
                                     buffer = buffer + symbol
-                                elif not re.search(cadCaracRegx, symbol).group(0) and not self.q81:
+                                elif not re.search(cadCaracRegex, symbol).group(0) and not self.q81:
                                     self.q81 = True
                                 elif buffer == "\n" and not self.q81:
-                                    buffer = self.writeIdentifiedToken(
-                                                Token(Acronym.CMF.value, buffer, lineCount),
-                                                buffer,
-                                                symbol
-                                            )
+                                    self.errors.append(Token(Acronym.CMF.value, buffer, lineCount))
+                                    buffer = ""
                                     self.q8 = False
 
                                 if self.q81:
                                     if symbol == quote[0]:
                                         buffer = buffer + symbol
-                                        buffer = self.writeIdentifiedToken(
-                                                    Token(Acronym.CMF.value, buffer, lineCount),
-                                                    buffer,
-                                                    symbol
-                                                )
+                                        self.errors.append(Token(Acronym.CMF.value, buffer, lineCount))
+                                        buffer = ""
                                         self.q81 = False
                                         self.q8 = False
                                     elif symbol == "\n":
-                                        buffer = self.writeIdentifiedToken(
-                                                    Token(Acronym.CMF.value, buffer, lineCount),
-                                                    buffer,
-                                                    symbol
-                                                )
+                                        self.errors.append(Token(Acronym.CMF.value, buffer, lineCount))
+                                        buffer = ""
                                         self.q81 = False
                                         self.q8 = False
                                     else:
@@ -796,18 +645,12 @@ class LexicalAnalizer():
                                 buffer = buffer + symbol
                                 if len(line) > symbolCount+1:
                                     if line[symbolCount+1] in separatorForTMFIDELOG:
-                                        buffer = self.writeIdentifiedToken(
-                                                    Token(Acronym.TMF.value, buffer, lineCount),
-                                                    buffer,
-                                                    symbol
-                                                )
+                                        self.errors.append(Token(Acronym.TMF.value, buffer, lineCount))
+                                        buffer = ""
                                         self.q9 = False
                                 elif len(line) == symbolCount+1:
-                                    buffer = self.writeIdentifiedToken(
-                                                Token(Acronym.TMF.value, buffer, lineCount),
-                                                buffer,
-                                                symbol
-                                            )
+                                    self.errors.append(Token(Acronym.TMF.value, buffer, lineCount))
+                                    buffer = ""
                                     self.q9 = False
 
                         if self.commentLine:
@@ -825,35 +668,34 @@ class LexicalAnalizer():
                         if self.q8 or self.q81:
                             if len(line) > symbolCount+1:
                                 if line[symbolCount+1] == "\n":
-                                    buffer = self.writeIdentifiedToken(
-                                                Token(Acronym.CMF.value, buffer, lineCount),
-                                                buffer,
-                                                symbol
-                                            )
+                                    self.errors.append(Token(Acronym.CMF.value, buffer, lineCount))
+                                    buffer = ""
                                     self.q81 = False
                                     self.q8 = False
                             if  len(line) == symbolCount+1:
-                                buffer = self.writeIdentifiedToken(
-                                            Token(Acronym.CMF.value, buffer, lineCount),
-                                            buffer,
-                                            symbol
-                                        )
+                                self.errors.append(Token(Acronym.CMF.value, buffer, lineCount))
+                                buffer = ""
                                 self.q81 = False
                                 self.q8 = False
 
                         symbolCount += 1
                     lineCount += 1
                 if self.commentBlock:
-                    buffer = self.writeIdentifiedToken(
-                                Token(Acronym.COMF.value, buffer, lineCount),
-                                buffer,
-                                symbol
-                            )
+                    self.errors.append(Token(Acronym.COMF.value, buffer, lineCount))
+                    buffer = ""
                     self.commentBlock = False
+
+                if len(self.errors) == 0:
+                    self.outputFile.write("\n ############ Arquivo foi analisado com sucesso! ############")
+                else:
+                    self.outputFile.write("\n ############ Erros encontrados ############\n\n")
+                    for error in self.errors:
+                        self.writeIdentifiedToken(error)
+
                 self.outputFile.close()
                 self.inputFile.close()
 
-    def writeIdentifiedToken(self, token: Token, buffer: str, symbol: str):
+    def writeIdentifiedToken(self, token: Token):
         self.outputFile.write(token.formatedValue() + "\n")
         return ""
 

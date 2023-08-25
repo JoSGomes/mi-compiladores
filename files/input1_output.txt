@@ -1,3 +1,11 @@
-1. <IDE, sofjv>
-1. <ART, *>
-1. <TMF, %ao>
+1. <IDE, teste>
+1. <ART, />
+5. <IDE, teste>
+7. <PRE, const>
+9. <PRE, for>
+
+ ############ Erros encontrados ############
+
+1. <TMF, \\\>
+3. <TMF, %$#>
+3. <TMF, &>

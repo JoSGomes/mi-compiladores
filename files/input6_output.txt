@@ -1,3 +1,11 @@
 1. <IDE, retirar>
 1. <IDE, da>
+
+ ############ Erros encontrados ############
+
+1. <TMF, \\\>
+3. <TMF, %$#>
+3. <TMF, &>
+1. <IMF, até>
+1. <IMF, pressão>
 1. <IMF, pressão>

@@ -5,3 +5,12 @@
 1. <IDE, temperos>
 1. <IDE, a>
 1. <IDE, gosto>
+
+ ############ Erros encontrados ############
+
+1. <TMF, \\\>
+3. <TMF, %$#>
+3. <TMF, &>
+1. <IMF, até>
+1. <IMF, pressão>
+1. <IMF, pressão>
