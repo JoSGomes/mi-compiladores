@@ -1,6 +1,6 @@
 1. <IDE, panela>
 1. <IDE, de>
 
- ############ Erros encontrados ############
+############ Erros encontrados ############
 
 1. <IMF, pressão>

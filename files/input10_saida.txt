@@ -7,6 +7,6 @@
 1. <IDE, o>
 1. <IDE, fogo>
 
- ############ Erros encontrados ############
+############ Erros encontrados ############
 
 1. <IMF, até>

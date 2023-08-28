@@ -1,3 +1,0 @@
-1. <IDE, sal>
-
- ############ Arquivo foi analisado com sucesso! ############

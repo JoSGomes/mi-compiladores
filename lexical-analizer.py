@@ -1,4 +1,3 @@
-from io import TextIOWrapper
 import os 
 import re
 from enum import Enum
@@ -120,9 +119,9 @@ class LexicalAnalizer():
     def analize(self):
         dirs = os.listdir(self.filesPath)
         for dir in dirs:
-            if not dir.endswith("_output.txt"):
+            if not dir.endswith("_saida.txt"):
                 self.inputFile = open(self.filesPath + "/" + dir, "r", encoding="utf8")
-                self.outputFile = open(self.filesPath + "/" + dir.split(".")[0] + "_output.txt", "w", encoding="utf8")
+                self.outputFile = open(self.filesPath + "/" + dir.split(".")[0] + "_saida.txt", "w", encoding="utf8")
                 lineCount = 1
                 print(dir)
                 buffer = ""
@@ -238,7 +237,7 @@ class LexicalAnalizer():
                                                     self.q113 = True
                                             else:
                                                 self.q113 = True
-
+    
                                         if line[symbolCount+1] in (relList + artList + delList + logList) or (not re.search(digRegex, symbol) and not symbol == ".") and not self.q112 and not self.q113:
                                             self.q114 = True
 
@@ -344,6 +343,13 @@ class LexicalAnalizer():
                                                     self.q1 = False
 
                                             if line[symbolCount+1] in separatorForNumbers and (len(buffer.split(".")) == 2 and not buffer.split(".")[1] == '') or (len(buffer.split(".")) > 2 and line[symbolCount+1] in separatorForNumbers):
+                                                self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
+                                                buffer = ""
+                                                self.q114 = False
+                                                self.q11 = False
+                                                self.q1 = False
+                                                
+                                            elif line[symbolCount+1] == " ":
                                                 self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
                                                 buffer = ""
                                                 self.q114 = False
@@ -681,7 +687,7 @@ class LexicalAnalizer():
                         symbolCount += 1
                     lineCount += 1
                 if self.commentBlock:
-                    self.errors.append(Token(Acronym.COMF.value, buffer, lineCount))
+                    self.errors.append(Token(Acronym.COMF.value, buffer.replace("\n", " "), lineCount))
                     buffer = ""
                     self.commentBlock = False
 

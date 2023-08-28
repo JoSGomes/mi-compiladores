@@ -6,4 +6,4 @@
 1. <IDE, a>
 1. <IDE, gosto>
 
- ############ Arquivo foi analisado com sucesso! ############
+############ Arquivo foi analisado com sucesso! ############

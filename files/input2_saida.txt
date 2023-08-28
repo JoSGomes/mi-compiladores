@@ -55,14 +55,15 @@
 52. <IDE, a>
 58. <DEL, ]>
 58. <DEL, [>
+60. <DEL, ,>
 
- ############ Erros encontrados ############
+############ Erros encontrados ############
 
 1. <NMF, 3..variavel>
 1. <NMF, 893..variables>
 2. <IMF, ab@>
 2. <NMF, 1.1.1.>
-3. <NMF, 1. >
+3. <NMF, 1.>
 3. <NMF, 9.0.0>
 6. <NMF, 3.+aa>
 9. <NMF, 3.3.3.3@1@a>
@@ -103,14 +104,5 @@
 56. <NMF, 3.4.5.>
 57. <NMF, 1.,2>
 59. <NMF, 1nt>
-71. <COMF, /*
-
-3....+1 156.+hji, 7!1
-Aaa$eof56&_. const abc
-A+1 "isso é uma cadeia errada"
-& aeo_ just 15.3.2.1; //cheio de erro
-" não vou fechar isso
-/*
-Isso não é um comentário de bloco
-*
-Jksjsjsksksjsksks>
+60. <NMF, 1.,>
+72. <COMF, /*  3....+1 156.+hji, 7!1 Aaa$eof56&_. const abc A+1 "isso é uma cadeia errada" & aeo_ just 15.3.2.1; //cheio de erro " não vou fechar isso /* Isso não é um comentário de bloco * Jksjsjsksksjsksks>

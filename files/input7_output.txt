@@ -1,5 +1,0 @@
-1. <IDE, descasca>
-1. <IDE, a>
-1. <IDE, batata>
-
- ############ Arquivo foi analisado com sucesso! ############
