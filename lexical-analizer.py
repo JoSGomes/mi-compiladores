@@ -24,7 +24,10 @@ preList = [
         "boolean", 
         "string", 
         "true", 
-        "false"
+        "false",
+        "this",
+        "constructor",
+        "extends"
     ]
 
 artList = ["+", "-", "*", "/", "++", "--"] # Feito

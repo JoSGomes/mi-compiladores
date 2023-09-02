@@ -1,0 +1,4 @@
+variables{
+int identifier
+real identifier
+}
