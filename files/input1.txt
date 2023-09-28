@@ -1,4 +1,3 @@
-this
-constructor
-
-banana->constructor()
+variables{}
+const{}
+const { variables { }

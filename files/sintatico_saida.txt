@@ -10,4 +10,6 @@
 3. <DEL, {>
 3. <DEL, }>
 
-############ Arquivo foi analisado com sucesso! ############
+############ Erros encontrados ############
+
+Esperava { e encontrou na linha 3. <PRE, variables>

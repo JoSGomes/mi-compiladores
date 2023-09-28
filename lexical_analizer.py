@@ -118,6 +118,8 @@ class LexicalAnalizer():
         self.commentBlock = False
 
         self.errors = [] #Vetor de erros
+        
+        self.tokens = []
 
     def analize(self):
         dirs = os.listdir(self.filesPath)
@@ -241,10 +243,15 @@ class LexicalAnalizer():
                                             else:
                                                 self.q113 = True
     
-                                        if line[symbolCount+1] in (relList + artList + delList + logList) or (not re.search(digRegex, symbol) and not symbol == ".") and not self.q112 and not self.q113:
-                                            self.q114 = True
+                                        if line[symbolCount+1] in (relList + artList + delList + logList) or (not re.search(digRegex, symbol) and not symbol == ".") and not self.q112 and not self.q113 and not self.q114:
+                                            if re.search(digRegex, symbol):
+                                                buffer = self.writeIdentifiedToken(Token(Acronym.NRO.value, buffer, lineCount))
+                                                self.q1 = False
+                                                self.q11 = False
+                                            else:
+                                                self.q114 = True
 
-                                        if (re.search(digRegex, symbol) or symbol == ".") and not self.q112 and not self.q113 and not self.q114:
+                                        if (re.search(digRegex, symbol) or symbol == ".")and not self.q111 and not self.q112 and not self.q113 and not self.q114:
                                             buffer = buffer + symbol
                                         elif not self.q112 and not self.q113 and not self.q114:
                                             self.q111 = True
@@ -696,6 +703,7 @@ class LexicalAnalizer():
 
                 if len(self.errors) == 0:
                     self.outputFile.write("\n############ Arquivo foi analisado com sucesso! ############")
+                    return self.tokens #tirar
                 else:
                     self.outputFile.write("\n############ Erros encontrados ############\n\n")
                     for error in self.errors:
@@ -705,10 +713,12 @@ class LexicalAnalizer():
 
                 self.outputFile.close()
                 self.inputFile.close()
+                return self.tokens
 
     def writeIdentifiedToken(self, token: Token):
         self.outputFile.write(token.formatedValue() + "\n")
+        self.tokens.append(token.formatedValue())
         return ""
 
 lexicalAnalizer = LexicalAnalizer(PATH_FILES)
-lexicalAnalizer.analize()
+tokens = lexicalAnalizer.analize()

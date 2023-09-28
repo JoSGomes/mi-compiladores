@@ -1,8 +1,36 @@
-! Welcome to GOLD Parser Builder 5.2
-"Start Symbol" = <VariablesBlock>
-<VariablesBlock> ::=  <PREvariables> '{' <Variables> '}'
-<Variables> ::= <Variable> | <Variable> <Variables>
-<Variable> ::= <Type> <IDE>
-<PREvariables> ::= variables
-<Type> ::= int | real
-<IDE> ::= identifier
+﻿"Start Symbol" = <START>
+! ------- Terminals (copiado da gramatica total)
+Integer = {Number}+
+     
+Decimal = {Number}+ '.' {Number}+
+
+IDE = {Letter} ({Letter} | {Number} | '_')*
+    
+{String Chars} = {Printable} - {NBSP} - ["]
+StringLiteral = '"' {String Chars}* '"'
+
+! ------- Atribuição de variável
+
+<START> ::= <STATEMENT> ';'
+
+<STATEMENT> ::= IDE '=' <VALUE> !---- adicionar a possibilidade de ser expressao art/logica/relacional.
+
+<VALUE> ::= IDE
+        | Integer
+        | Decimal
+        | StringLiteral
+        | <VECTOR_ASSIGN_BLOCK>
+
+<VECTOR_ASSIGN_BLOCK> ::= '[' <ELEMENTS> ']' 
+                       
+<ELEMENTS> ::= <ELEMENT> <MULTIPLE_ELEMENTS>
+
+<N_DIMENSIONS_ASSIGN> ::= '[' <ELEMENTS>  ']'
+
+<MULTIPLE_ELEMENTS> ::= | ',' <ELEMENT> <MULTIPLE_ELEMENTS> | ',' <N_DIMENSIONS_ASSIGN> <MULTIPLE_ELEMENTS>
+
+<ELEMENT>  ::= IDE
+           | Integer
+           | Decimal
+           | StringLiteral
+
