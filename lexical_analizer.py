@@ -128,7 +128,6 @@ class LexicalAnalizer():
                 self.inputFile = open(self.filesPath + "/" + dir, "r", encoding="utf8")
                 self.outputFile = open(self.filesPath + "/" + dir.split(".")[0] + "_saida.txt", "w", encoding="utf8")
                 lineCount = 1
-                print(dir)
                 buffer = ""
                 for line in self.inputFile.readlines():                    
                     symbolCount = 0
@@ -233,7 +232,7 @@ class LexicalAnalizer():
                                                 self.q1 = False
                                         
                                 if self.q11:
-                                    if len(line) > symbolCount+1 and not self.q111 and not self.q112 and not self.q113 and not self.q114:
+                                    if len(line) > symbolCount+1 and not self.q111 and not self.q112 and not self.q113 and not self.q114 and self.q11:
                                         if line[symbolCount+1] == quote[0]:
                                             self.q112 = True
                                         if line[symbolCount+1] == "/":
@@ -243,21 +242,22 @@ class LexicalAnalizer():
                                             else:
                                                 self.q113 = True
     
-                                        if line[symbolCount+1] in (relList + artList + delList + logList) or (not re.search(digRegex, symbol) and not symbol == ".") and not self.q112 and not self.q113 and not self.q114:
+                                        if line[symbolCount+1] in separatorForNumbers or (not re.search(digRegex, symbol) and not symbol == ".") and not self.q112 and not self.q113 and not self.q114 and self.q11:
                                             if re.search(digRegex, symbol):
+                                                buffer = buffer + symbol
                                                 buffer = self.writeIdentifiedToken(Token(Acronym.NRO.value, buffer, lineCount))
                                                 self.q1 = False
                                                 self.q11 = False
                                             else:
                                                 self.q114 = True
 
-                                        if (re.search(digRegex, symbol) or symbol == ".")and not self.q111 and not self.q112 and not self.q113 and not self.q114:
+                                        if re.search(digRegex, symbol) or (symbol == "." and "." not in buffer) and not self.q111 and not self.q112 and not self.q113 and not self.q114 and self.q11:
                                             buffer = buffer + symbol
                                         elif not self.q112 and not self.q113 and not self.q114:
                                             self.q111 = True
 
 
-                                        if line[symbolCount+1] in separatorForNumbers and not self.q111 and not self.q112 and not self.q113 and not self.q114:
+                                        if line[symbolCount+1] in separatorForNumbers and not self.q111 and not self.q112 and not self.q113 and not self.q114 and self.q11:
                                             if buffer.endswith(".") or len(buffer.split(".")) > 2:
                                                 self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
                                                 buffer = ""
@@ -266,7 +266,7 @@ class LexicalAnalizer():
                                             self.q11 = False
                                             self.q1 = False
 
-                                    elif len(line) == symbolCount+1 and not self.q111 and not self.q112 and not self.q113 and not self.q114:
+                                    elif len(line) == symbolCount+1 and not self.q111 and not self.q112 and not self.q113 and not self.q114 and self.q11:
                                         buffer = buffer + symbol
                                         if buffer.endswith(".") or len(buffer.split(".")) > 2 or re.search(wordRegex, buffer) or not re.search(cadCaracRegex, buffer):
                                             self.errors.append(Token(Acronym.NMF.value, buffer, lineCount))
@@ -717,7 +717,13 @@ class LexicalAnalizer():
 
     def writeIdentifiedToken(self, token: Token):
         self.outputFile.write(token.formatedValue() + "\n")
-        self.tokens.append(token.formatedValue())
+        self.tokens.append(
+                {
+                    "type": token.getName(),
+                    "value": token.getValue(),
+                    "line": token.getLine()
+                }
+            )
         return ""
 
 lexicalAnalizer = LexicalAnalizer(PATH_FILES)

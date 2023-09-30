@@ -8,5 +8,10 @@ class Token():
     def formatedValue(self):
         return "%d. <%s, %s>" % (self.line, self.name, self.value)
 
-        
+    def getName(self):
+        return self.name   
+    def getValue(self):
+        return self.value 
+    def getLine(self):
+        return self.line
     

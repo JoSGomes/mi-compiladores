@@ -1,3 +1,23 @@
-variables{}
-const{}
-const { variables { }
+const {
+    int sete = 4, oito = 25;
+
+}
+
+variables {
+    int a[43], b, c;
+    real d[a], e, f[5]
+    int d[a], e, f[5]
+    int d[a], e, f[5];
+    int d[a], e, f[5];
+    int d[a], e, f[5]
+}
+
+class main{
+    variables {
+        boolean flag;
+    }
+    objects {
+    }
+    methods{      
+    }
+}
