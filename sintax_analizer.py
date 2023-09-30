@@ -158,12 +158,15 @@ class SintaxAnalizer():
             self.saveError(";", "\\n", self.previousTokenLine)
 
     #----------------------------------------------------------------
+
     def _objectsBlock(self):
         self.match("objects")
         self.match("{")
         #self._objects()
         self.match("}")
+
     #----------------------------------------------------------------
+
     def _main(self):
         self.match("class") #colocar class_block
         self.match("main")
@@ -214,6 +217,7 @@ class SintaxAnalizer():
     def _mainType(self):
         if not self._type():
             self.match("void")
+            
     #----------------------------------------------------------------
 
 

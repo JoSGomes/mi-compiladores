@@ -1,5 +1,5 @@
 const {
-    int sete = 4, oito = 25;
+    int sete = 4,, oito 25;
 
 }
 

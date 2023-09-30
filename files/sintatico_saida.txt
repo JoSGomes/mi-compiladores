@@ -5,8 +5,8 @@
 2. <REL, =>
 2. <NRO, 4>
 2. <DEL, ,>
+2. <DEL, ,>
 2. <IDE, oito>
-2. <REL, =>
 2. <NRO, 25>
 2. <DEL, ;>
 4. <DEL, }>
@@ -104,6 +104,8 @@
 
 ############ !!! Erros sintáticos encontrados !!! ############
 
+Erro de tipo: Na linha 2, esperava IDE e encontrou DEL.
+Na linha 2, esperava = e encontrou oito.
 Na linha 8, esperava ; e encontrou \n.
 Na linha 9, esperava ; e encontrou \n.
 Na linha 12, esperava ; e encontrou \n.
