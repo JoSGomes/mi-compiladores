@@ -1,4 +1,0 @@
-1. <NRO, 15>
-1. <IDE, minutos>
-
-############ Arquivo foi analisado com sucesso! ############

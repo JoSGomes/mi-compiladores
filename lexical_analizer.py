@@ -45,6 +45,7 @@ others = ["\n", '\t']
 separatorForNumbers = [";", ",", "(", ")", "[", "]", "{", "}", " "] + logList + relList + artList + quote + others
 separatorForTMFIDELOG = delList + logList + relList + artList + quote + others
 
+tokensOutput = []
 class Acronym(Enum):
     PRE  = "PRE"    #palavra reservada
     IDE  = "IDE"    #identificador
@@ -119,14 +120,20 @@ class LexicalAnalizer():
 
         self.errors = [] #Vetor de erros
         
-        self.tokens = []
+        self.tokens = {}
+        
+        self.dirsOutput = []
 
     def analize(self):
         dirs = os.listdir(self.filesPath)
-        for dir in dirs:
-            if not dir.endswith("_saida.txt"):
+        for dir in dirs:  
+            if not dir.endswith("_saida.txt"):             
                 self.inputFile = open(self.filesPath + "/" + dir, "r", encoding="utf8")
-                self.outputFile = open(self.filesPath + "/" + dir.split(".")[0] + "_saida.txt", "w", encoding="utf8")
+                self.tokens = {
+                    "output": self.filesPath + "/" + dir.split(".")[0] + "_saida.txt",
+                    "tokens": []
+                }
+                
                 lineCount = 1
                 buffer = ""
                 for line in self.inputFile.readlines():                    
@@ -702,29 +709,26 @@ class LexicalAnalizer():
                     self.commentBlock = False
 
                 if len(self.errors) == 0:
-                    self.outputFile.write("\n############ Arquivo foi analisado com sucesso! ############")
-                    return self.tokens #tirar
+                    pass
+                    #print("############ Arquivo foi analisado com sucesso! ############")
                 else:
-                    self.outputFile.write("\n############ Erros encontrados ############\n\n")
+                    #print("\n############ Erros léxicos encontrados ############")
                     for error in self.errors:
                         self.writeIdentifiedToken(error)
                     
                     self.errors = []
 
-                self.outputFile.close()
+                tokensOutput.append(self.tokens)
                 self.inputFile.close()
-                return self.tokens
+
+        return tokensOutput
 
     def writeIdentifiedToken(self, token: Token):
-        self.outputFile.write(token.formatedValue() + "\n")
-        self.tokens.append(
+        self.tokens["tokens"].append(
                 {
                     "type": token.getName(),
                     "value": token.getValue(),
                     "line": token.getLine()
-                }
+                },
             )
         return ""
-
-lexicalAnalizer = LexicalAnalizer(PATH_FILES)
-tokens = lexicalAnalizer.analize()

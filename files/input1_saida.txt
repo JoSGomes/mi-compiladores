@@ -102,4 +102,10 @@
 22. <DEL, }>
 23. <DEL, }>
 
-############ Arquivo foi analisado com sucesso! ############
+############ !!! Erros sintáticos encontrados !!! ############
+
+Erro de tipo: Na linha 2, esperava IDE e encontrou DEL.
+Na linha 2, esperava = e encontrou oito.
+Na linha 8, esperava ; e encontrou \n.
+Na linha 9, esperava ; e encontrou \n.
+Na linha 12, esperava ; e encontrou \n.

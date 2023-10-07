@@ -1,3 +1,5 @@
+from logger import Logger
+
 PATH_FILES = "./files"
 
 typesVar = ["int", "real", "boolean", "string"]
@@ -5,7 +7,7 @@ typesValue = ["NRO", "CAC"]
 valueTrueFalse = ["true", "false"]
 
 class SintaxAnalizer(): 
-    def __init__(self, tokens):
+    def __init__(self, tokens: dict, outputDir: str):
         self.tokens = tokens  
         self.lookahead = tokens[0]
         self.tokensCounter = 1
@@ -13,6 +15,8 @@ class SintaxAnalizer():
         self.currentTokenLine = self.lookahead["line"]
         self.errors = []
         self.outputFile = None
+        self.outputDir = outputDir
+        self.logger = Logger("sintax_analizer")
 
     def matchTokenType(self, tokenType: str | list, doubt: bool = False) -> bool:
         if type(tokenType) == list:
@@ -87,31 +91,37 @@ class SintaxAnalizer():
     #----------------------------------------------------------------
 
     def _constsBlock(self):
+        self.logger.I("constsBlock")
         self.match("const")
         self.match("{")
         self._consts()
 
     def _consts(self):
+        self.logger.I("consts")
         if not self.match("}", True):
             self._const()
             self._consts()
 
     def _const(self):
+        self.logger.I("const")
         self._type()
         self._constAttribution()
         self._multipleConsts()
 
     def _constAttribution(self):
+        self.logger.I("_constAttribution")
         self.matchTokenType("IDE")
         self.match("=")
         self._attribution()
 
     def _attribution(self):
+        self.logger.I("_attribution")
         if not self.matchTokenType(typesValue, True):
             if not self.match(valueTrueFalse, True):
                 self.saveErrorType(typesValue + valueTrueFalse, self.lookahead["type"] + ": " + self.lookahead["value"], self.lookahead["line"])
 
     def _multipleConsts(self):
+        self.logger.I("_multipleConsts")
         if not self.match(";", True) and self.previousTokenLine == self.currentTokenLine:
             self.match(",")
             self._constAttribution()
@@ -120,35 +130,42 @@ class SintaxAnalizer():
     #----------------------------------------------------------------
     
     def _variablesBlock(self):
+        self.logger.I("_variablesBlock")
         self.match("variables")
         self.match("{")
         self._variables()
 
     def _variables(self):
+        self.logger.I("_variables")
         if not self.match("}", True):
             self._variable()
             self._variables()
 
     def _variable(self):
+        self.logger.I("_variable")
         self._type()
         self._decVariable()         
         self._multipleVariablesLine()
 
     def _decVariable(self):
+        self.logger.I("_decVariable")
         self.matchTokenType("IDE")
         self._dimensions()
 
     def _dimensions(self):
+        self.logger.I("_dimensions")
         if self.match("[", True):
             self._sizeDimension()
             self.match("]")
             self._dimensions()
     
     def _sizeDimension(self):
+        self.logger.I("_sizeDimension")
         if not self.matchTokenType("IDE", True):
             self.matchTokenType("NRO")
 
     def _multipleVariablesLine(self):
+        self.logger.I("_multipleVariablesLine")
         result = self.match(";", True)
         if not result and self.previousTokenLine == self.currentTokenLine:
             self.match(",")
@@ -160,6 +177,7 @@ class SintaxAnalizer():
     #----------------------------------------------------------------
 
     def _objectsBlock(self):
+        self.logger.I("_objectsBlock")
         self.match("objects")
         self.match("{")
         #self._objects()
@@ -168,21 +186,25 @@ class SintaxAnalizer():
     #----------------------------------------------------------------
 
     def _main(self):
+        self.logger.I("_main")
         self.match("class") #colocar class_block
         self.match("main")
         self.match("{")
         self._initMain()
 
     def _initMain(self):
+        self.logger.I("_initMain")
         self._bodyBlocks()
         self._mainMethods()
         self.match("}")
 
     def _bodyBlocks(self):
+        self.logger.I("_bodyBlocks")
         self._variablesBlock()
         self._objectsBlock() 
 
     def _mainMethods(self):
+        self.logger.I("_mainMethods")
         self.match("methods")
         self.match("{")
         #self._mainMethodsBody()
@@ -222,11 +244,12 @@ class SintaxAnalizer():
 
 
     def analize(self):
-        self.outputFile = open(PATH_FILES + "/sintatico_saida.txt", "w", encoding="utf8")
+        self.outputFile = open(self.outputDir, "w", encoding="utf8")
 
         self._constsBlock()
         self._variablesBlock() 
         self._main()
 
         self.writeTokensAndErrors()
+        self.logger.closeLogs()
         self.outputFile.close()

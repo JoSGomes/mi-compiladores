@@ -4,10 +4,11 @@ from sintax_analizer import SintaxAnalizer
 PATH_FILES = "./files"
 
 lexicalAnalizer = LexicalAnalizer(PATH_FILES)
-tokens = lexicalAnalizer.analize()
+tokensOutputs = lexicalAnalizer.analize()
 
-sintaxAnalizer = SintaxAnalizer(tokens)
-sintaxAnalizer.analize()
+for tokensOutput in tokensOutputs:
+    sintaxAnalizer = SintaxAnalizer(tokensOutput["tokens"], tokensOutput["output"])
+    sintaxAnalizer.analize()
 
 
 
