@@ -26,7 +26,6 @@
 8. <IDE, d>
 8. <DEL, [>
 8. <IDE, a>
-8. <DEL, ]>
 8. <DEL, ,>
 8. <IDE, e>
 8. <DEL, ,>
@@ -106,6 +105,27 @@
 
 Erro de tipo: Na linha 2, esperava IDE e encontrou DEL.
 Na linha 2, esperava = e encontrou oito.
-Na linha 8, esperava ; e encontrou \n.
-Na linha 9, esperava ; e encontrou \n.
-Na linha 12, esperava ; e encontrou \n.
+Na linha 8, esperava ] e encontrou ,.
+Na linha 8, esperava , e encontrou e.
+Erro de tipo: Na linha 8, esperava IDE e encontrou DEL.
+Na linha 8, esperava , e encontrou f.
+Erro de tipo: Na linha 8, esperava IDE e encontrou DEL.
+Na linha 8, esperava , e encontrou 5.
+Erro de tipo: Na linha 8, esperava IDE e encontrou DEL.
+Na linha 9, esperava , e encontrou int.
+Na linha 10, esperava , e encontrou int.
+Na linha 13, esperava , e encontrou }.
+Erro de tipo: Na linha 15, esperava IDE e encontrou PRE.
+Na linha 15, esperava , e encontrou main.
+Erro de tipo: Na linha 15, esperava IDE e encontrou DEL.
+Na linha 16, esperava , e encontrou variables.
+Erro de tipo: Na linha 16, esperava IDE e encontrou DEL.
+Na linha 17, esperava , e encontrou boolean.
+Na linha 19, esperava class e encontrou objects.
+Na linha 19, esperava main e encontrou {.
+Na linha 20, esperava { e encontrou }.
+Na linha 21, esperava variables e encontrou methods.
+Na linha 23, esperava objects e encontrou }.
+Na linha 23, esperava { e encontrou }.
+Na linha 23, esperava methods e encontrou }.
+Na linha 23, esperava { e encontrou }.

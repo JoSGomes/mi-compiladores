@@ -5,7 +5,7 @@ const {
 
 variables {
     int a[43], b, c;
-    real d[a], e, f[5]
+    real d[a, e, f[5]
     int d[a], e, f[5]
     int d[a], e, f[5];
     int d[a], e, f[5];

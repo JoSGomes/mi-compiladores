@@ -18,11 +18,12 @@ class SintaxAnalizer():
         self.outputDir = outputDir
         self.logger = Logger("sintax_analizer")
 
-    def matchTokenType(self, tokenType: str | list, doubt: bool = False) -> bool:
+    def matchTokenType(self, tokenType: str | list, doubt: bool = False, _pass: bool = True) -> bool:
         if type(tokenType) == list:
             for t in tokenType:
                 if t in self.lookahead["type"]:
-                    self.nextLookahead()
+                    if _pass:
+                        self.nextLookahead()
                     return True
             if not doubt:
                 self.saveErrorType(tokenType, self.lookahead["type"], self.lookahead["line"])
@@ -30,7 +31,8 @@ class SintaxAnalizer():
             return False
             
         if tokenType in self.lookahead["type"]:
-            self.nextLookahead()
+            if _pass:
+                self.nextLookahead()
             return True
         else:
             if not doubt:
@@ -38,11 +40,12 @@ class SintaxAnalizer():
                 self.nextLookahead()
             return False
         
-    def match(self, terminal: str | list, doubt: bool = False) -> bool:
+    def match(self, terminal: str | list, doubt: bool = False, _pass: bool = True) -> bool:
         if type(terminal) == list:
             for t in terminal:
                 if t in self.lookahead["value"]:
-                    self.nextLookahead()
+                    if _pass: #É pra passar o lookahead? -> se for só uma verificação não é pra passar (viria _pass = False)
+                        self.nextLookahead()
                     return True
             if not doubt:
                 self.saveError(terminal, self.lookahead["value"], self.lookahead["line"])
@@ -50,7 +53,8 @@ class SintaxAnalizer():
             return False
                 
         if terminal in self.lookahead["value"]:
-            self.nextLookahead()
+            if _pass:
+                self.nextLookahead()
             return True
         else:
             if not doubt:
@@ -122,7 +126,7 @@ class SintaxAnalizer():
 
     def _multipleConsts(self):
         self.logger.I("_multipleConsts")
-        if not self.match(";", True) and self.previousTokenLine == self.currentTokenLine:
+        if not self.match(";", True):
             self.match(",")
             self._constAttribution()
             self._multipleConsts() 
@@ -167,11 +171,11 @@ class SintaxAnalizer():
     def _multipleVariablesLine(self):
         self.logger.I("_multipleVariablesLine")
         result = self.match(";", True)
-        if not result and self.previousTokenLine == self.currentTokenLine:
+        if not result:
             self.match(",")
             self._decVariable()
             self._multipleVariablesLine()
-        elif not result and not self.previousTokenLine == self.currentTokenLine:
+        elif not result:
             self.saveError(";", "\\n", self.previousTokenLine)
 
     #----------------------------------------------------------------
@@ -180,11 +184,84 @@ class SintaxAnalizer():
         self.logger.I("_objectsBlock")
         self.match("objects")
         self.match("{")
-        #self._objects()
-        self.match("}")
+        self._objects()
+
+    def _objects(self):
+        self.logger.I("_objects")
+        if not self.match("}", True):
+            self._object()
+            self._objects()
+
+    def _object(self):
+        self.logger.I("_object")
+        self.matchTokenType("IDE")
+        self._decVariable()
+        self._multipleObjects()
+    
+    def _multipleObjects(self):
+        self.logger.I("_multipleObjects")
+        if not self.match(";", True):
+            self._decVariable()
+            self._multipleObjects()
 
     #----------------------------------------------------------------
 
+    def _classBlock(self):
+        self.logger.I("_classBlock")
+        self.match("class")
+        self._ideClass()
+
+    def _ideClass(self):
+        self.logger.I("_ideClass")
+        if self.match("main", True, False):
+            self._main()
+        elif self.matchTokenType("IDE", True):
+            self._extends()
+        else:
+            self.saveError(['main', 'IDE'], self.lookahead, self.currentTokenLine)
+            self.nextLookahead()
+
+    def _extends(self):
+        self.logger.I("_extends")
+        if self.match("{", True, False):
+            self._startClassBlock()
+        elif self.match("extends", True):
+            self.matchTokenType("IDE")
+            self._startClassBlock()
+        else:
+            self.saveError(['{', 'extends'], self.lookahead, self.currentTokenLine)
+            self.nextLookahead()
+
+    def _startClassBlock(self):
+        self.logger.I("_startClassBlock")
+        self.match("{")
+        self._initClass()
+    
+    def _initClass(self):
+        self.logger.I("_initClass")
+        self._bodyBlocks()
+        self._methodsBlock()
+        self._constructor()
+
+    def _constructor(self):
+        self.logger.I("_constructor")
+        self.match("constructor")
+        self.match("(")
+        self._decParametersConstructor()#
+        self.match(")")
+        self.match("{")
+        self._variablesBlock()
+        self._objectsBlock()
+        self._commands()
+        self.match("}")
+        self._endClass()
+
+    def _endClass(self):
+        self.logger.I("_endClass")
+        self.match("}")
+        self._classBlock()
+
+    #----------------------------------------------------------------
     def _main(self):
         self.logger.I("_main")
         self.match("class") #colocar class_block
@@ -207,29 +284,130 @@ class SintaxAnalizer():
         self.logger.I("_mainMethods")
         self.match("methods")
         self.match("{")
-        #self._mainMethodsBody()
+        self._mainMethodsBody()
         self.match("}")
 
-    # def _mainMethodsBody(self):
-    #     self._mainType()
-    #     self.match("main")
-    #     self.match("(")
-    #     self.match(")")
-    #     self.match("{")
-    #     self._methodBody()
-    #     self._methods() #TODO: implement this all gram
+    def _mainMethodsBody(self):
+        self.logger.I("_mainMethodsBody")
+        self._mainType()
+        self.match("main")
+        self.match("(")
+        self.match(")")
+        self.match("{")
+        self._methodBody()
+        self._methods()
     
-    # def _methodBody(self): 
-    #     self._variablesBlock()
-    #     self.objectsBlock()
-    #     self._commandsMethodBody()
+    def _methodBody(self): 
+        self.logger.I("_methodBody")
+        self._variablesBlock()
+        self.objectsBlock()
+        self._commandsMethodBody()
     
-    # def _commandsMethodBody(self): #TODO: implement this all gram
-    #     self.match("return")
-    #     self._return()
-    #     self.match(";")
-    #     self.match("}")
+    def _commandsMethodBody(self):
+        self.logger.I("_commandsMethodBody")
+        self._commands()
+        self.match("return")        
+        self._return()#
+        self.match(";")
+        self.match("}")
+        
     
+    def _commands(self):
+        self.logger.I("_commands")
+        if self.match(['print', 'read', 'if', 'for', 'IDE'], True, False):        
+            self._command()
+            self._commands()
+
+    def _command(self):
+        self.logger.I("_command")
+        if self.match('print', True, False):
+            self._printBegin()
+        elif self.match('read', True, False):
+            self._readBegin()
+        elif self.match('if', True, False):
+            self._if()
+        elif self.match('for', True, False):
+            self._for()
+        elif self.matchTokenType('IDE', True, False):
+            self._objectAccessOrAssignment()
+            self.match(';')
+     #----------------------------------------------------------------
+    def _printBegin(self):
+        self.logger.I("_printBegin")
+        self.match('print')
+        self.match('(')
+        self._printEnd()
+
+    def _printEnd(self):
+        self.logger.I("_printEnd")
+        self._printParameter()
+        self.match(')')
+        self.match(';')
+
+    def _printParameter(self):
+        self.logger.I("_printParameter")
+        if self.matchTokenType('IDE', True, False):
+            self._decObjectAttributeAccess() 
+        elif self.matchTokenType('CAC', True):
+            return
+        elif self.matchTokenType('NRO', True):
+            return
+        self.saveError(['IDE', 'CAC', 'NRO'], self.lookahead, self.currentTokenLine)
+        self.nextLookahead()
+    #----------------------------------------------------------------
+    def _decObjectAttributeAccess(self):
+        self.logger.I("_decObjectAttributeAccess")
+        self.matchTokenType('IDE')
+        self._dimensions()
+        self._endObjectAttributeAccess()
+
+    def _endObjectAttributeAccess(self):
+        self.logger.I("_endObjectAttributeAccess")
+        if self.match('.', True):
+            self._multipleObjectAttributeAccess()
+
+    def _multipleObjectAttributeAccess(self):
+        self.logger.I("_multipleObjectAttributeAccess")
+        self._decVariable()
+        self._endObjectAttributeAccess()
+
+    def _objectMethodOrObjectAccess(self):
+        self.logger.I("_objectMethodOrObjectAccess")
+        self.objectMethodOrObjectAccessOrPart()
+    
+    def _objectMethodOrObjectAccessOrPart(self):
+        self.logger.I("_objectMethodOrObjectAccessOrPart")
+        self._decObjectAttributeAccess()
+        self._optionalObjectMethodAccess()
+    
+    def _optionalObjectMethodAccess(self):
+        self.logger.I("_optionalObjectMethodAccess")
+        if self.match('->', True):
+            self._objectMethodAccessEnd()            
+
+    def _objectMethodAccessEnd(self):
+        self.logger.I("_objectMethodAccessEnd")
+        self.match('->')
+        self._ideOrConstructor()
+        self.match('(')
+        self._parameters()
+        self.match(')')
+    
+    def _ideOrConstructor(self):
+        self.logger.I("_ideOrConstructor")
+        if self.match('constructor', True):
+            return
+        elif self.matchTokenType('IDE', True):
+            return
+        self.saveError(['constructor', 'IDE'], self.lookahead, self.currentTokenLine)
+        self.nextLookahead()
+    #----------------------------------------------------------------
+    def _parameters(self):
+        self.logger.I("_parameters")
+        self._value()#
+        self._multParameters()#
+
+    #----------------------------------------------------------------
     # def _return(self): #TODO: implement this all gram
     #     self._value()
 
@@ -239,7 +417,9 @@ class SintaxAnalizer():
     def _mainType(self):
         if not self._type():
             self.match("void")
-            
+            return
+        
+        self.saveError(['void', typesVar], self.lookahead, self.currentTokenLine)
     #----------------------------------------------------------------
 
 
