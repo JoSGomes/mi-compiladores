@@ -31,7 +31,7 @@ preList = [
     ]
 
 artList = ["+", "-", "*", "/", "++", "--"] # Feito
-relList = ["!=", "==", "<", ">", "<=", "=>", "="] #Feito
+relList = ["!=", "==", "<", ">", "<=", ">=", "="] #Feito
 logList = ["!", "&", "|"] #Feito
 comList = ["/*", "*/"] #Feito
 
@@ -598,16 +598,17 @@ class LexicalAnalizer():
                             if self.q5:
                                 if line[symbolCount+1] == "=":
                                     self.q51 = True
-                                else:
+                                elif not self.q51:
                                     buffer = buffer + symbol
                                     buffer = self.writeIdentifiedToken(Token(Acronym.REL.value, buffer, lineCount))
                                     self.q5 = False
                                 
                                 if self.q51:
                                     buffer = buffer + symbol
-                                    buffer = self.writeIdentifiedToken(Token(Acronym.REL.value, buffer, lineCount))
-                                    self.q51 = False
-                                    self.q5 = False
+                                    if buffer == ">=":
+                                        buffer = self.writeIdentifiedToken(Token(Acronym.REL.value, buffer, lineCount))
+                                        self.q51 = False
+                                        self.q5 = False
 
                             if self.q6:
                                 if line[symbolCount+1] == "=":

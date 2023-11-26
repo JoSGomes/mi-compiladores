@@ -16,6 +16,7 @@ class SintaxAnalizer():
         self.errors = []
         self.outputFile = None
         self.outputDir = outputDir
+        self.initLineOfIgnoredTokens = None
         self.logger = Logger("sintax_analizer")
 
     def matchTokenType(self, tokenType: str | list, doubt: bool = False, _pass: bool = True) -> bool:
@@ -26,7 +27,7 @@ class SintaxAnalizer():
                         self.nextLookahead()
                     return True
             if not doubt:
-                self.saveError(tokenType, self.lookahead["type"], self.lookahead["line"])
+                self.saveError(tokenType, self.lookahead, self.currentTokenLine)
                 self.nextLookahead()
             return False
             
@@ -36,7 +37,7 @@ class SintaxAnalizer():
             return True
         else:
             if not doubt:
-                self.saveError(tokenType, self.lookahead["type"], self.lookahead["line"])
+                self.saveError(tokenType, self.lookahead, self.currentTokenLine)
                 self.nextLookahead()
             return False
         
@@ -92,11 +93,11 @@ class SintaxAnalizer():
         self._constsBlock()
         self._variablesBlock()
         self._classBlock()
-
+        print("teste")
     #----------------------------------------------------------------
 
     def _type(self):
-        self.match(typesVar)
+        self.match(typesVar, True)
  
     #----------------------------------------------------------------
 
@@ -128,7 +129,7 @@ class SintaxAnalizer():
         self.logger.I("_attribution")
         if not self.matchTokenType(typesValue, True):
             if not self.match(valueTrueFalse, True):
-                self.saveError(typesValue + valueTrueFalse, self.lookahead["type"] + ": " + self.lookahead["value"], self.lookahead["line"])
+                self.saveError(typesValue + valueTrueFalse, self.lookahead["value"], self.currentTokenLine)
 
     def _multipleConsts(self):
         self.logger.I("_multipleConsts")
@@ -224,7 +225,7 @@ class SintaxAnalizer():
         elif self.matchTokenType("IDE", True):
             self._extends()
         else:
-            self.saveError(['main', 'IDE'], self.lookahead, self.currentTokenLine)
+            self.saveError(['main', 'IDE'], self.lookahead["value"], self.currentTokenLine)
             self.nextLookahead()
 
     def _extends(self):
@@ -235,7 +236,7 @@ class SintaxAnalizer():
             self.matchTokenType("IDE")
             self._startClassBlock()
         else:
-            self.saveError(['{', 'extends'], self.lookahead, self.currentTokenLine)
+            self.saveError(['{', 'extends'], self.lookahead["value"], self.currentTokenLine)
             self.nextLookahead()
 
     def _startClassBlock(self):
@@ -283,7 +284,7 @@ class SintaxAnalizer():
             self._objectParam()
             return
 
-        self.saveError(typesVar + 'IDE', self.lookahead, self.currentTokenLine)
+        self.saveError(typesVar + 'IDE', self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     def _multDecParametersConstructor(self):
@@ -318,9 +319,10 @@ class SintaxAnalizer():
             self._method()
             self._methods()
             return
+        
     def _method(self):
         self.logger.I("_method")
-        self._types()#
+        self._types()
         self.matchTokenType('IDE')
         self.match('(')
         self._decParameters()
@@ -333,7 +335,7 @@ class SintaxAnalizer():
             self._typesVariables()
             return
         
-        self.saveError(typesVar + 'IDE' + 'void', self.lookahead, self.currentTokenLine)
+        self.saveError(typesVar + 'IDE' + 'void', self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     def _typesVariables(self):
@@ -343,7 +345,7 @@ class SintaxAnalizer():
         elif self.matchTokenType('IDE', True, True):
             return
         
-        self.saveError(typesVar + 'IDE', self.lookahead, self.currentTokenLine)
+        self.saveError(typesVar + 'IDE', self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     def _decParameters(self):
@@ -363,10 +365,12 @@ class SintaxAnalizer():
             self._typesVariables()
             self.matchTokenType('IDE')
             self._multDecParameters()
+            return
         elif self.match(')', True, False):
             self._endDecParameters()
+            return
 
-        self.saveError([',', ')'], self.lookahead, self.currentTokenLine)
+        self.saveError([',', ')'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     def _endDecParameters(self):
@@ -378,7 +382,6 @@ class SintaxAnalizer():
     #----------------------------------------------------------------
     def _main(self):
         self.logger.I("_main")
-        self.match("class") #colocar class_block
         self.match("main")
         self.match("{")
         self._initMain()
@@ -387,7 +390,12 @@ class SintaxAnalizer():
         self.logger.I("_initMain")
         self._bodyBlocks()
         self._mainMethods()
+
+        numberBeforeLastMatch = self.lookahead["line"]
         self.match("}")
+        numberAfterLastMatch = self.lookahead["line"]
+        if numberBeforeLastMatch != numberAfterLastMatch:
+            self.initLineOfIgnoredTokens = self.lookahead
 
     def _bodyBlocks(self):
         self.logger.I("_bodyBlocks")
@@ -421,14 +429,14 @@ class SintaxAnalizer():
         self.logger.I("_commandsMethodBody")
         self._commands()
         self.match("return")        
-        self._return()#
+        self._return()
         self.match(";")
         self.match("}")
         
     
     def _commands(self):
         self.logger.I("_commands")
-        if self.match(['print', 'read', 'if', 'for', 'IDE'], True, False):        
+        if self.match(['print', 'read', 'if', 'for', 'this'], True, False) or self.matchTokenType('IDE', True, False):        
             self._command()
             self._commands()
 
@@ -441,8 +449,8 @@ class SintaxAnalizer():
         elif self.match('if', True, False):
             self._if()
         elif self.match('for', True, False):
-            self._forBlock()#
-        elif self.matchTokenType('IDE', True, False):
+            self._forBlock()
+        elif self.matchTokenType('IDE', True, False) or self.match('this', True, False):
             self._objectAccessOrAssignment()
             self.match(';')
 
@@ -465,12 +473,13 @@ class SintaxAnalizer():
         self.logger.I("_printParameter")
         if self.matchTokenType('IDE', True, False):
             self._decObjectAttributeAccess() 
+            return
         elif self.matchTokenType('CAC', True):
             return
         elif self.matchTokenType('NRO', True):
             return
         
-        self.saveError(['IDE', 'CAC', 'NRO'], self.lookahead, self.currentTokenLine)
+        self.saveError(['IDE', 'CAC', 'NRO'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     #----------------------------------------------------------------
@@ -527,7 +536,7 @@ class SintaxAnalizer():
         elif self.match(['++', '--'], True, True):
             return
 
-        self.saveError(['=', '++', '--'], self.lookahead, self.currentTokenLine)
+        self.saveError(['=', '++', '--'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     def _forIncrement(self):
@@ -583,15 +592,15 @@ class SintaxAnalizer():
         elif self.match('ART', True, True):
             return
         
-        self.saveError(['ART', '=', '->'], self.lookahead, self.currentTokenLine)
+        self.saveError(['ART', '=', '->'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     #----------------------------------------------------------------
     def _decObjectAttributeAccess(self):
         self.logger.I("_decObjectAttributeAccess")
-        self.matchTokenType('IDE')
-        self._dimensions()
-        self._endObjectAttributeAccess()
+        if self.matchTokenType('IDE', True, True) or self.match('this', True, True):
+            self._dimensions()
+            self._endObjectAttributeAccess()
 
     def _endObjectAttributeAccess(self):
         self.logger.I("_endObjectAttributeAccess")
@@ -614,7 +623,7 @@ class SintaxAnalizer():
     
     def _optionalObjectMethodAccess(self):
         self.logger.I("_optionalObjectMethodAccess")
-        if self.match('->', True):
+        if self.match('->', True, False):
             self._objectMethodAccessEnd()            
 
     def _objectMethodAccessEnd(self):
@@ -631,13 +640,14 @@ class SintaxAnalizer():
             return
         elif self.matchTokenType('IDE', True):
             return
-        self.saveError(['constructor', 'IDE'], self.lookahead, self.currentTokenLine)
+        self.saveError(['constructor', 'IDE'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
     #----------------------------------------------------------------
     def _parameters(self):
         self.logger.I("_parameters")
-        self._value()
-        self._multParameters()
+        if self.match(['[', '!', '('], True, False) or self.matchTokenType(['NRO', 'CAC', 'IDE'], True, False):
+            self._value()
+            self._multParameters()
     
     def _value(self):
         self.logger.I("_value")
@@ -662,7 +672,7 @@ class SintaxAnalizer():
         elif self.match(valueTrueFalse, True, True):
             return
         
-        self.saveError(['NRO', 'CAC', 'IDE', '[', '!', '('], self.lookahead, self.currentTokenLine)
+        self.saveError(['NRO', 'CAC', 'IDE', '[', '!', '('], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
     
     def _simpleOrDoubleArithimeticExpressionOptional(self):
@@ -670,9 +680,6 @@ class SintaxAnalizer():
         if self.matchTokenType('ART', True, False):
             self._simpleOrDoubleArithimeticExpression()
             return
-        
-        self.saveError('ART', self.lookahead, self.currentTokenLine)
-        self.nextLookahead()
 
     def _vectorAssignBlock(self):
         self.logger.I("_vectorAssignBlock")
@@ -693,7 +700,7 @@ class SintaxAnalizer():
         self.logger.I("_parenthesesBegin")
         self.match('(')
         self._expressions()
-        self._parenthesesEnd()#
+        self._parenthesesEnd()
     
     def _parenthesesEnd(self):
         self.logger.I("_parenthesesEnd")
@@ -724,7 +731,7 @@ class SintaxAnalizer():
             self._simpleOrLogicalIDEBegin()
             return
 
-        self.saveError(['NRO', 'IDE', '(', 'true', 'false', '!'], self.lookahead, self.currentTokenLine)
+        self.saveError(['NRO', 'IDE', '(', 'true', 'false', '!'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     def _simpleExpressionWithoutParentheses(self):
@@ -742,7 +749,7 @@ class SintaxAnalizer():
             self._logicalExpressionEnd()
             return
 
-        self.saveError(['true', 'false', '!'], self.lookahead, self.currentTokenLine)
+        self.saveError(['true', 'false', '!'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     def _simpleOrLogicalIDEBegin(self):
@@ -761,24 +768,22 @@ class SintaxAnalizer():
             self._logicalExpressionEnd()
             return
         
-        self.saveError(['ART', '->'], self.lookahead, self.currentTokenLine)
+        self.saveError(['ART', '->'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     def _arithimeticOrlogicalExpression(self):
         self.logger.I("_arithimeticOrlogicalExpression")
-        if self.match('->', True, False):
-            self._optionalObjectMethodAccess()
-            self._logRelOptional()
-            self._logicalExpressionEnd()
-        elif self.matchTokenType('ART', True, False):
+        if self.matchTokenType('ART', True, False):
             self._simpleOrDoubleArithimeticExpression()
-
-        self.saveError(['ART', '->'], self.lookahead, self.currentTokenLine)
-        self.nextLookahead()
-
+            return
+        
+        self._optionalObjectMethodAccess()
+        self._logRelOptional()
+        self._logicalExpressionEnd()
+        
     def _logRelOptional(self):
         self.logger.I("_logRelOptional")
-        if self.matchTokenType('REL'):
+        if self.matchTokenType('REL', True, True):
             self._relationalExpressionValue()
             return
         
@@ -796,10 +801,13 @@ class SintaxAnalizer():
             return
         elif self.match('(', True, True):
             self._logicalExpression()
-        elif self.match(valueTrueFalse.append('IDE'), True, False):
+            self.match(')')
+            return
+        elif self.match(valueTrueFalse + ['this'], True, False) or self.matchTokenType('IDE', True, False):
             self._logicalExpressionValue()
+            return
 
-        self.saveError(['!', '(', 'true', 'false', 'IDE'], self.lookahead, self.currentTokenLine)
+        self.saveError(['!', '(', 'true', 'false', 'IDE'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     def _logicalExpression(self):
@@ -810,10 +818,12 @@ class SintaxAnalizer():
     def _logicalExpressionValue(self):
         if self.match(valueTrueFalse, True, True):
             return
-        elif self.matchTokenType('IDE', True, False):
+        elif self.matchTokenType('IDE', True, False) or self.match('this', True, False):
             self._objectMethodOrObjectAccess()
+            self._logRelOptional()
+            return
 
-        self.saveError(['true', 'false', 'IDE'], self.lookahead, self.currentTokenLine)
+        self.saveError(['true', 'false', 'IDE'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     def _relationalExpressionValue(self):
@@ -825,7 +835,7 @@ class SintaxAnalizer():
         elif self.matchTokenType('CAC', True, True):
             return
         
-        self.saveError(['NRO', 'IDE', 'CAC'], self.lookahead, self.currentTokenLine)
+        self.saveError(['NRO', 'IDE', 'CAC'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     def _elementsAssign(self):
@@ -833,7 +843,7 @@ class SintaxAnalizer():
         self._elementAssign()
         self._multipleElementsAssign()
 
-    def _multipleElementsASsign(self):
+    def _multipleElementsAssign(self):
         self.logger.I("_multipleElementsASsign")
         if self.match(',', True):
             self._elementAssign()
@@ -848,7 +858,7 @@ class SintaxAnalizer():
             self._nDimensionsAssign()
             return
         
-        self.saveError(['IDE', 'CAC', 'NRO', '['], self.lookahead, self.currentTokenLine)
+        self.saveError(['IDE', 'CAC', 'NRO', '['], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     def _nDimensionsAssign(self):
@@ -881,7 +891,7 @@ class SintaxAnalizer():
             self._parenthesisExpression()
             return
         
-        self.saveError(['NRO', '('], self.lookahead, self.currentTokenLine)
+        self.saveError(['NRO', '('], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
 
     def _part(self):
@@ -890,8 +900,9 @@ class SintaxAnalizer():
             return
         elif self.matchTokenType('IDE', True, False):
             self._objectMethodOrObjectAccessOrPart()
+            return
         
-        self.saveError(['NRO', 'IDE'], self.lookahead, self.currentTokenLine)
+        self.saveError(['NRO', 'IDE'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
     
     def _endExpressionOptional(self):
@@ -914,12 +925,11 @@ class SintaxAnalizer():
             self._endExpression() 
             return
         elif self.match('(', True, False):
-            self._objectMethodOrObjectAccessOrPart()
+            self._parenthesisExpression()
             return
 
-        self.saveError(['NRO', 'IDE', '('], self.lookahead, self.currentTokenLine)
+        self.saveError(['NRO', 'IDE', '('], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
-
 
     def _multParameters(self):
         self.logger.I("_multParameters")
@@ -939,7 +949,7 @@ class SintaxAnalizer():
             self.match("void")
             return
         
-        self.saveError(['void', typesVar], self.lookahead, self.currentTokenLine)
+        self.saveError(['void', typesVar], self.lookahead["value"], self.currentTokenLine)
     #----------------------------------------------------------------
 
 
