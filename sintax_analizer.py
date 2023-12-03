@@ -27,7 +27,7 @@ class SintaxAnalizer():
                         self.nextLookahead()
                     return True
             if not doubt:
-                self.saveError(tokenType, self.lookahead, self.currentTokenLine)
+                self.saveError(tokenType, self.lookahead["value"], self.currentTokenLine)
                 self.nextLookahead()
             return False
             
@@ -37,7 +37,7 @@ class SintaxAnalizer():
             return True
         else:
             if not doubt:
-                self.saveError(tokenType, self.lookahead, self.currentTokenLine)
+                self.saveError(tokenType, self.lookahead["value"], self.currentTokenLine)
                 self.nextLookahead()
             return False
         
@@ -93,7 +93,7 @@ class SintaxAnalizer():
         self._constsBlock()
         self._variablesBlock()
         self._classBlock()
-        print("teste")
+
     #----------------------------------------------------------------
 
     def _type(self):
