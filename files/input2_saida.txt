@@ -28,11 +28,8 @@
 15. <DEL, }>
 16. <PRE, return>
 16. <DEL, ;>
-16. <DEL, ;>
 17. <DEL, }>
 18. <DEL, }>
 19. <DEL, }>
 
-############ !!! Erros sintáticos encontrados !!! ############
-
-Na linha 16, esperava } e encontrou ;.
+############ Arquivo foi analisado com sucesso! ############
