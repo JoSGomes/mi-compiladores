@@ -13,7 +13,7 @@ class main{
             }
             objects {
             }
-            return;;
+            return;
         } 
     }
 }
