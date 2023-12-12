@@ -1,6 +1,0 @@
-variables{
-int sete, oito;
-real um, dois, tres4quatro;
-string variavel, variavel2;
-boolean teste, aaa;
-}

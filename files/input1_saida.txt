@@ -996,6 +996,7 @@
 157. <DEL, }>
 158. <PRE, objects>
 158. <DEL, {>
+158. <DEL, }>
 159. <PRE, this>
 159. <DEL, ->>
 159. <IDE, metodo3>
@@ -1024,23 +1025,4 @@
 163. <DEL, }>
 164. <DEL, }>
 
-############ !!! Erros sintáticos encontrados !!! ############
-
-Na linha 159, esperava IDE e encontrou this.
-Na linha 159, esperava IDE e encontrou ->.
-Na linha 159, esperava IDE e encontrou (.
-Na linha 159, esperava IDE e encontrou ).
-Na linha 160, esperava IDE e encontrou this.
-Na linha 160, esperava IDE e encontrou ->.
-Na linha 160, esperava IDE e encontrou (.
-Na linha 160, esperava IDE e encontrou ,.
-Na linha 160, esperava IDE e encontrou 3.
-Na linha 160, esperava IDE e encontrou ,.
-Na linha 160, esperava IDE e encontrou ,.
-Na linha 160, esperava IDE e encontrou 5.
-Na linha 160, esperava IDE e encontrou ,.
-Na linha 160, esperava IDE e encontrou 6.
-Na linha 160, esperava IDE e encontrou ).
-Na linha 161, esperava IDE e encontrou return.
-Na linha 163, esperava return e encontrou }.
-Na linha 164, esperava ; e encontrou }.
+############ Arquivo foi analisado com sucesso! ############

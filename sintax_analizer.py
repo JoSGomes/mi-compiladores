@@ -29,6 +29,7 @@ class SintaxAnalizer():
             if not doubt:
                 self.saveError(tokenType, self.lookahead["value"], self.currentTokenLine)
                 self.nextLookahead()
+                self.logger.E(self.errors[-1])
             return False
             
         if tokenType in self.lookahead["type"]:
@@ -39,6 +40,7 @@ class SintaxAnalizer():
             if not doubt:
                 self.saveError(tokenType, self.lookahead["value"], self.currentTokenLine)
                 self.nextLookahead()
+                self.logger.E(self.errors[-1])
             return False
         
     def match(self, terminal: str | list, doubt: bool = False, _pass: bool = True) -> bool:
@@ -51,6 +53,7 @@ class SintaxAnalizer():
             if not doubt:
                 self.saveError(terminal, self.lookahead["value"], self.lookahead["line"])
                 self.nextLookahead()
+                self.logger.E(self.errors[-1])
             return False
                 
         if terminal in self.lookahead["value"]:
@@ -61,6 +64,7 @@ class SintaxAnalizer():
             if not doubt:
                 self.saveError(terminal, self.lookahead["value"], self.lookahead["line"])
                 self.nextLookahead()
+                self.logger.E(self.errors[-1])
             return False
         
     def nextLookahead(self):
@@ -69,19 +73,20 @@ class SintaxAnalizer():
             self.lookahead = self.tokens[self.tokensCounter]
             self.currentTokenLine = self.lookahead["line"]
             self.tokensCounter += 1
-        else:
-            print("EOF, Arquivo analisado com sucesso!")
 
     def saveError(self, expected: str | list, findOut: str, line: int):
         self.errors.append("Na linha %i, esperava %s e encontrou %s." % (line, expected, findOut))
 
     def writeTokensAndErrors(self):
+        
         for token in self.tokens:
             self.outputFile.write("%i. <%s, %s>\n" % (token["line"], token["type"], token["value"]))
 
         if len(self.errors) == 0:
             self.outputFile.write("\n############ Arquivo foi analisado com sucesso! ############")
+            print("EOF, Arquivo analisado com sucesso!")
         else:
+            print("EOF, Arquivo analisado, mas com erros!")
             self.outputFile.write("\n############ !!! Erros sintáticos encontrados !!! ############\n\n")
             for error in self.errors:
                 self.outputFile.write(error + "\n")
@@ -130,6 +135,8 @@ class SintaxAnalizer():
         if not self.matchTokenType(typesValue, True):
             if not self.match(valueTrueFalse, True):
                 self.saveError(typesValue + valueTrueFalse, self.lookahead["value"], self.currentTokenLine)
+                self.nextLookahead()
+                self.logger.E(self.errors[-1])
 
     def _multipleConsts(self):
         self.logger.I("_multipleConsts")
@@ -177,14 +184,16 @@ class SintaxAnalizer():
 
     def _multipleVariablesLine(self):
         self.logger.I("_multipleVariablesLine")
-        result = self.match(";", True)
-        if not result:
-            self.match(",")
+        if self.match(";", True):
+            return
+        elif self.match(",", True):
             self._decVariable()
             self._multipleVariablesLine()
-        elif not result:
-            self.saveError(";", "\\n", self.previousTokenLine)
-
+            return
+        
+        self.saveError([";", ","], self.lookahead["value"], self.currentTokenLine)
+        self.nextLookahead()
+        self.logger.E(self.errors[-1])
     #----------------------------------------------------------------
 
     def _objectsBlock(self):
@@ -227,6 +236,7 @@ class SintaxAnalizer():
         else:
             self.saveError(['main', 'IDE'], self.lookahead["value"], self.currentTokenLine)
             self.nextLookahead()
+            self.logger.E(self.errors[-1])
 
     def _extends(self):
         self.logger.I("_extends")
@@ -238,6 +248,7 @@ class SintaxAnalizer():
         else:
             self.saveError(['{', 'extends'], self.lookahead["value"], self.currentTokenLine)
             self.nextLookahead()
+            self.logger.E(self.errors[-1])
 
     def _startClassBlock(self):
         self.logger.I("_startClassBlock")
@@ -286,6 +297,7 @@ class SintaxAnalizer():
 
         self.saveError(typesVar + 'IDE', self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _multDecParametersConstructor(self):
         self.logger.I("_multDecParametersConstructor")
@@ -337,6 +349,7 @@ class SintaxAnalizer():
         
         self.saveError(typesVar + 'IDE' + 'void', self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _typesVariables(self):
         self.logger.I("_typesVariables")
@@ -347,6 +360,7 @@ class SintaxAnalizer():
         
         self.saveError(typesVar + 'IDE', self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _decParameters(self):
         self.logger.I("_decParameters")
@@ -372,6 +386,7 @@ class SintaxAnalizer():
 
         self.saveError([',', ')'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _endDecParameters(self):
         self.logger.I("_endDecParameters")
@@ -481,6 +496,7 @@ class SintaxAnalizer():
         
         self.saveError(['IDE', 'CAC', 'NRO'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     #----------------------------------------------------------------
 
@@ -538,6 +554,7 @@ class SintaxAnalizer():
 
         self.saveError(['=', '++', '--'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _forIncrement(self):
         self.logger.I("_forIncrement")
@@ -594,6 +611,7 @@ class SintaxAnalizer():
         
         self.saveError(['ART', '=', '->'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     #----------------------------------------------------------------
     def _decObjectAttributeAccess(self):
@@ -642,6 +660,7 @@ class SintaxAnalizer():
             return
         self.saveError(['constructor', 'IDE'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
     #----------------------------------------------------------------
     def _parameters(self):
         self.logger.I("_parameters")
@@ -674,6 +693,7 @@ class SintaxAnalizer():
         
         self.saveError(['NRO', 'CAC', 'IDE', '[', '!', '('], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
     
     def _simpleOrDoubleArithimeticExpressionOptional(self):
         self.logger.I("_simpleOrDoubleArithimeticExpressionOptional")
@@ -733,6 +753,7 @@ class SintaxAnalizer():
 
         self.saveError(['NRO', 'IDE', '(', 'true', 'false', '!'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _simpleExpressionWithoutParentheses(self):
         self.logger.I("_simpleExpressionWithoutParentheses")
@@ -751,6 +772,7 @@ class SintaxAnalizer():
 
         self.saveError(['true', 'false', '!'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _simpleOrLogicalIDEBegin(self):
         self.logger.I("_simpleOrLogicalIDEBegin")
@@ -770,6 +792,7 @@ class SintaxAnalizer():
         
         self.saveError(['ART', '->'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _arithimeticOrlogicalExpression(self):
         self.logger.I("_arithimeticOrlogicalExpression")
@@ -809,6 +832,7 @@ class SintaxAnalizer():
 
         self.saveError(['!', '(', 'true', 'false', 'IDE'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _logicalExpression(self):
         self.logger.I("_logicaExpression")
@@ -825,6 +849,7 @@ class SintaxAnalizer():
 
         self.saveError(['true', 'false', 'IDE'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _relationalExpressionValue(self):
         if self.matchTokenType('NRO', True, True):
@@ -837,6 +862,7 @@ class SintaxAnalizer():
         
         self.saveError(['NRO', 'IDE', 'CAC'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _elementsAssign(self):
         self.logger.I("_elementsAssign")
@@ -860,6 +886,7 @@ class SintaxAnalizer():
         
         self.saveError(['IDE', 'CAC', 'NRO', '['], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _nDimensionsAssign(self):
         self.logger.I("_nDimensionsAssign")
@@ -893,6 +920,7 @@ class SintaxAnalizer():
         
         self.saveError(['NRO', '('], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _part(self):
         self.logger.I("_part")
@@ -904,6 +932,7 @@ class SintaxAnalizer():
         
         self.saveError(['NRO', 'IDE'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
     
     def _endExpressionOptional(self):
        self.logger.I("_endExpressionOptional")
@@ -930,6 +959,7 @@ class SintaxAnalizer():
 
         self.saveError(['NRO', 'IDE', '('], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
+        self.logger.E(self.errors[-1])
 
     def _multParameters(self):
         self.logger.I("_multParameters")
@@ -945,11 +975,14 @@ class SintaxAnalizer():
             return
 
     def _mainType(self):
-        if not self._type():
-            self.match("void")
+        if self.match(typesVar, True):
+            return
+        elif self.match("void", True):
             return
         
         self.saveError(['void', typesVar], self.lookahead["value"], self.currentTokenLine)
+        self.nextLookahead()
+        self.logger.E(self.errors[-1])
     #----------------------------------------------------------------
 
 
