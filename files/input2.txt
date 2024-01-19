@@ -1,4 +1,6 @@
 const {
+    int sete = 4;
+    int sete = 5;
 }
 variables {
 }

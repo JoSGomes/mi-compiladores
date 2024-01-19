@@ -18,6 +18,8 @@ class SintaxSemanticAnalizer():
         self.outputDir = outputDir
         self.initLineOfIgnoredTokens = None
         
+        self.tempVar = None
+        self.globalScope = []
         self.scopeControl = []
 
         self.loggerSintax = Logger("sintax_analizer")
@@ -78,8 +80,27 @@ class SintaxSemanticAnalizer():
             self.currentTokenLine = self.lookahead["line"]
             self.tokensCounter += 1
 
+    def scopeIDEVerification(self, scope: list, ide: str) -> bool:
+        for element in scope: 
+            if element["identification"] == ide:
+                return True
+        return False
+    
+    def appendToScope(self, scope: list, ide: str, type: str, parameters: list[str] = None, instantiated: bool = None) -> None:
+        scope.append(
+            {
+                "identification": ide,
+                "type": type,
+                "parameters": parameters,
+                "instantiated": instantiated
+            }
+        )
+    
     def saveError(self, expected: str | list, findOut: str, line: int):
         self.errors.append("Na linha %i, esperava %s e encontrou %s." % (line, expected, findOut))
+
+    def saveSemanticError(self, msg: str,  findOut: str, line: int):
+        self.errors.append("%s. %d %d" % (line, findOut, msg))
 
     def writeTokensAndErrors(self):
         
@@ -106,7 +127,9 @@ class SintaxSemanticAnalizer():
     #----------------------------------------------------------------
 
     def _type(self):
-        self.match(typesVar, True)
+        if self.match(typesVar, True, False):
+            self.tempVar = self.lookahead["value"]
+            self.match(typesVar)
  
     #----------------------------------------------------------------
 
@@ -130,14 +153,21 @@ class SintaxSemanticAnalizer():
 
     def _constAttribution(self):
         self.loggerSintax.I("_constAttribution")
-        self.matchTokenType("IDE")
+        if self.matchTokenType("IDE", True, False):
+            if self.scopeIDEVerification(self.globalScope, self.lookahead["value"]):
+                self.saveSemanticError("duplicado", self.lookahead["value"], self.currentTokenLine)
+                self.nextLookahead()
+            else:
+                self.appendToScope(scope=self.globalScope, ide=self.lookahead["value"], type=self.lookahead["type"])
+                self.matchTokenType("IDE", True)
+
         self.match("=")
         self._attribution()
 
     def _attribution(self):
         self.loggerSintax.I("_attribution")
-        if not self.matchTokenType(typesValue, True):
-            if not self.match(valueTrueFalse, True):
+        if not self.matchTokenType(typesValue, True, False):
+            if not self.match(valueTrueFalse, True, False):
                 self.saveError(typesValue + valueTrueFalse, self.lookahead["value"], self.currentTokenLine)
                 self.nextLookahead()
                 self.loggerSintax.E(self.errors[-1])
