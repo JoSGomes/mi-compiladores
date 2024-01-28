@@ -5,7 +5,8 @@ PATH_FILES = "./files"
 typesVar = ["int", "real", "boolean", "string"]
 typesValue = ["NRO", "CAC"]
 valueTrueFalse = ["true", "false"]
-
+incompatible = "Tipo recebido incompatível:"
+duplicated = "Variável duplicada:"
 class SintaxSemanticAnalizer(): 
     def __init__(self, tokens: dict, outputDir: str):
         self.tokens = tokens  
@@ -86,11 +87,11 @@ class SintaxSemanticAnalizer():
                 return True
         return False
     
-    def appendToScope(self, scope: list, ide: str, type: str, parameters: list[str] = None, instantiated: bool = None) -> None:
+    def appendToScope(self, scope: list, ide: str, typeIDE: str, parameters: list[str] = None, instantiated: bool = None) -> None:
         scope.append(
             {
                 "identification": ide,
-                "type": type,
+                "type": typeIDE,
                 "parameters": parameters,
                 "instantiated": instantiated
             }
@@ -100,7 +101,7 @@ class SintaxSemanticAnalizer():
         self.errors.append("Na linha %i, esperava %s e encontrou %s." % (line, expected, findOut))
 
     def saveSemanticError(self, msg: str,  findOut: str, line: int):
-        self.errors.append("%s. %d %d" % (line, findOut, msg))
+        self.errors.append("%d. %s %s" % (line, msg, findOut))
 
     def writeTokensAndErrors(self):
         
@@ -112,12 +113,15 @@ class SintaxSemanticAnalizer():
             print("EOF, Arquivo analisado com sucesso!")
         else:
             print("EOF, Arquivo analisado, mas com erros!")
-            self.outputFile.write("\n############ !!! Erros sintáticos encontrados !!! ############\n\n")
+            self.outputFile.write("\n############ !!! Erros encontrados !!! ############\n\n")
             for error in self.errors:
                 self.outputFile.write(error + "\n")
     
     #----------------------------------------------------------------
-    
+    #TODO: Inserir os identificadores locais;
+    #TODO: Realizar busca de identificadores globais na tabela;
+    #TODO: Realizar a busca de identificadores locais;
+    #TODO: Verificar a questão se os métodos já estão certos;
     def _program(self):
         self.loggerSintax.I("_program")
         self._constsBlock()
@@ -126,7 +130,7 @@ class SintaxSemanticAnalizer():
 
     #----------------------------------------------------------------
 
-    def _type(self):
+    def _type(self) -> str:
         if self.match(typesVar, True, False):
             self.tempVar = self.lookahead["value"]
             self.match(typesVar)
@@ -147,6 +151,7 @@ class SintaxSemanticAnalizer():
 
     def _const(self):
         self.loggerSintax.I("const")
+        # TODO: Preciso salvar esse tipo sempre
         self._type()
         self._constAttribution()
         self._multipleConsts()
@@ -155,22 +160,58 @@ class SintaxSemanticAnalizer():
         self.loggerSintax.I("_constAttribution")
         if self.matchTokenType("IDE", True, False):
             if self.scopeIDEVerification(self.globalScope, self.lookahead["value"]):
-                self.saveSemanticError("duplicado", self.lookahead["value"], self.currentTokenLine)
+                self.saveSemanticError(duplicated, self.lookahead["value"], self.currentTokenLine)
                 self.nextLookahead()
+                self.loggerSemantic.E(self.errors[-1])
             else:
-                self.appendToScope(scope=self.globalScope, ide=self.lookahead["value"], type=self.lookahead["type"])
-                self.matchTokenType("IDE", True)
+                self.appendToScope(scope=self.globalScope, ide=self.lookahead["value"], typeIDE=self.tempVar)
+                self.matchTokenType("IDE")
 
         self.match("=")
-        self._attribution()
+        # TODO: Em todos os lugares que tiver uma atribuição é necessário repassar onde ela está sendo feita.
+        self._attribution(self.globalScope, len(self.globalScope) - 1)
 
-    def _attribution(self):
+    def _attribution(self, scope: list, indexScope: int):
+        # TODO: Guardar a atribuição no index do scopo enviado.
         self.loggerSintax.I("_attribution")
-        if not self.matchTokenType(typesValue, True, False):
-            if not self.match(valueTrueFalse, True, False):
-                self.saveError(typesValue + valueTrueFalse, self.lookahead["value"], self.currentTokenLine)
+        if not self.matchTokenType(typesValue + valueTrueFalse, True, False):
+            self.saveError(typesValue + valueTrueFalse, self.lookahead["value"], self.currentTokenLine)
+            self.nextLookahead()
+            self.loggerSintax.E(self.errors[-1])
+        else:
+            typeOfVar = scope[indexScope]["type"]
+            if self.lookahead["type"] == 'NRO':
+                if len(self.lookahead["value"].split(".")) == 1:
+                    if typeOfVar == 'int':
+                        scope[indexScope]["instantiated"] = self.lookahead["value"]
+                        self.nextLookahead()
+                    else:
+                        self.saveSemanticError(incompatible, self.lookahead["value"], self.currentTokenLine)
+                        self.nextLookahead()
+                        self.loggerSemantic.E(self.errors[-1])
+                else:
+                    if typeOfVar == 'real':
+                        scope[indexScope]["instantiated"] = self.lookahead["value"]
+                        self.nextLookahead()
+                    else:
+                        self.saveSemanticError(incompatible, self.lookahead["value"], self.currentTokenLine)
+                        self.nextLookahead()
+                        self.loggerSemantic.E(self.errors[-1])
+            elif self.lookahead["type"] == 'CAC':
+                if typeOfVar == 'string':
+                    scope[indexScope]["instantiated"] = self.lookahead["value"]
+                    self.nextLookahead()
+                else:
+                    self.saveSemanticError(incompatible, self.lookahead["value"], self.currentTokenLine)
+                    self.nextLookahead()
+                    self.loggerSemantic.E(self.errors[-1])
+            elif self.lookahead["value"] in valueTrueFalse:
+                scope[indexScope]["instantiated"] = self.lookahead["value"]
                 self.nextLookahead()
-                self.loggerSintax.E(self.errors[-1])
+            else:
+                self.saveSemanticError(incompatible, self.lookahead["value"], self.currentTokenLine)
+                self.nextLookahead()
+                self.loggerSemantic.E(self.errors[-1])
 
     def _multipleConsts(self):
         self.loggerSintax.I("_multipleConsts")
@@ -1027,4 +1068,4 @@ class SintaxSemanticAnalizer():
 
         self.writeTokensAndErrors()
         self.loggerSintax.closeLogs()
-        self.outputFile.close()
+        self.outputFile.close()#

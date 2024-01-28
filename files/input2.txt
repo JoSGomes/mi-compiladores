@@ -1,6 +1,9 @@
 const {
-    int sete = 4;
-    int sete = 5;
+    int sete = 4, oito = 25;
+    real um = 4, dois = 1.1;
+    string variavel="false", variavel2="4";
+    boolean teste = false;
+    boolean teste_2 = true;
 }
 variables {
 }
