@@ -158,20 +158,20 @@ class SintaxSemanticAnalizer():
         self.loggerSintax.I("constsBlock")
         self.match("const")
         self.match("{")
-        self._consts()
+        self._consts(self.globalScope)
 
-    def _consts(self):
+    def _consts(self, scope: list):
         self.loggerSintax.I("consts")
         if not self.match("}", True):
-            self._const()
+            self._const(scope)
             self._consts()
 
-    def _const(self):
+    def _const(self, scope: list):
         self.loggerSintax.I("const")
         # TODO: Preciso salvar esse tipo sempre
         self._type()
-        self._constAttribution()
-        self._multipleConsts()
+        self._constAttribution(scope)
+        self._multipleConsts(scope)
 
     def _constAttribution(self):
         self.loggerSintax.I("_constAttribution")
@@ -250,7 +250,7 @@ class SintaxSemanticAnalizer():
     def _decVariable(self):
         # TODO: AQUI É NECESSÁRIO VERIFICAR O ESCOPO LOCAL ANTES DE CONSUMIR A IDE
         self.loggerSintax.I("_decVariable")
-        if self.scopeIDEVerification(self.globalScope, self.lookahead["value"]):
+        if self.scopeIDEVerification(self.globalScope, self.lookahead["value"]) and self.scopeIDEVerification(self.scopeControl, self.lookahead["value"]):
             self.semanticErrorsHandler("DUPLICATED")
         else:
             self.appendToScope(scope=self.globalScope, ide=self.lookahead["value"], typeIDE=self.tempVar)
