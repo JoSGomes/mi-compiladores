@@ -7,6 +7,9 @@ typesValue = ["NRO", "CAC"]
 valueTrueFalse = ["true", "false"]
 incompatible = "Tipo recebido incompatível:"
 duplicated = "Variável duplicada:"
+nonDeclared = "Não declarado:"
+invalidAtribution = "Atribuição inválida para constantes:"
+
 class SintaxSemanticAnalizer(): 
     def __init__(self, tokens: dict, outputDir: str):
         self.tokens = tokens  
@@ -87,13 +90,14 @@ class SintaxSemanticAnalizer():
                 return True
         return False
     
-    def appendToScope(self, scope: list, ide: str, typeIDE: str, parameters: list[str] = None, instantiated: bool = None) -> None:
+    def appendToScope(self, scope: list, ide: str, typeIDE: str, parameters: list[str] = None, constant: bool = False, instantiated: bool = None) -> None:
         scope.append(
             {
                 "identification": ide,
                 "type": typeIDE,
                 "parameters": parameters,
-                "instantiated": instantiated
+                "instantiated": instantiated,
+                "constant": constant
             }
         )
     
@@ -117,6 +121,19 @@ class SintaxSemanticAnalizer():
             for error in self.errors:
                 self.outputFile.write(error + "\n")
     
+    def semanticErrorsHandler(self, errorCase: str) -> None:
+        match errorCase:
+            case "IMCOMPATIBLE": #Incompatível
+                self.saveSemanticError(incompatible, self.lookahead["value"], self.currentTokenLine)
+            case "NONDECLARED": #Não declarado
+                self.saveSemanticError(nonDeclared, self.lookahead["value"], self.currentTokenLine)
+            case "DUPLICATED": #Duplicado
+                self.saveSemanticError(duplicated, self.lookahead["value"], self.currentTokenLine)
+            case "INVALIDATTRIBUITON": #Atribuição inválida constante
+                self.saveSemanticError(invalidAtribution, self.lookahead["value"], self.currentTokenLine)
+        self.nextLookahead()
+        self.loggerSemantic.E(self.errors[-1])
+
     #----------------------------------------------------------------
     #TODO: Inserir os identificadores locais;
     #TODO: Realizar busca de identificadores globais na tabela;
@@ -130,7 +147,7 @@ class SintaxSemanticAnalizer():
 
     #----------------------------------------------------------------
 
-    def _type(self) -> str:
+    def _type(self):
         if self.match(typesVar, True, False):
             self.tempVar = self.lookahead["value"]
             self.match(typesVar)
@@ -160,9 +177,7 @@ class SintaxSemanticAnalizer():
         self.loggerSintax.I("_constAttribution")
         if self.matchTokenType("IDE", True, False):
             if self.scopeIDEVerification(self.globalScope, self.lookahead["value"]):
-                self.saveSemanticError(duplicated, self.lookahead["value"], self.currentTokenLine)
-                self.nextLookahead()
-                self.loggerSemantic.E(self.errors[-1])
+                self.semanticErrorsHandler("DUPLICATED")
             else:
                 self.appendToScope(scope=self.globalScope, ide=self.lookahead["value"], typeIDE=self.tempVar)
                 self.matchTokenType("IDE")
@@ -186,32 +201,24 @@ class SintaxSemanticAnalizer():
                         scope[indexScope]["instantiated"] = self.lookahead["value"]
                         self.nextLookahead()
                     else:
-                        self.saveSemanticError(incompatible, self.lookahead["value"], self.currentTokenLine)
-                        self.nextLookahead()
-                        self.loggerSemantic.E(self.errors[-1])
+                        self.semanticErrorsHandler("INCOMPATIBLE")
                 else:
                     if typeOfVar == 'real':
                         scope[indexScope]["instantiated"] = self.lookahead["value"]
                         self.nextLookahead()
                     else:
-                        self.saveSemanticError(incompatible, self.lookahead["value"], self.currentTokenLine)
-                        self.nextLookahead()
-                        self.loggerSemantic.E(self.errors[-1])
+                        self.semanticErrorsHandler("INCOMPATIBLE")
             elif self.lookahead["type"] == 'CAC':
                 if typeOfVar == 'string':
                     scope[indexScope]["instantiated"] = self.lookahead["value"]
                     self.nextLookahead()
                 else:
-                    self.saveSemanticError(incompatible, self.lookahead["value"], self.currentTokenLine)
-                    self.nextLookahead()
-                    self.loggerSemantic.E(self.errors[-1])
+                    self.semanticErrorsHandler("INCOMPATIBLE")
             elif self.lookahead["value"] in valueTrueFalse:
                 scope[indexScope]["instantiated"] = self.lookahead["value"]
                 self.nextLookahead()
             else:
-                self.saveSemanticError(incompatible, self.lookahead["value"], self.currentTokenLine)
-                self.nextLookahead()
-                self.loggerSemantic.E(self.errors[-1])
+                self.semanticErrorsHandler("INCOMPATIBLE")
 
     def _multipleConsts(self):
         self.loggerSintax.I("_multipleConsts")
@@ -241,8 +248,13 @@ class SintaxSemanticAnalizer():
         self._multipleVariablesLine()
 
     def _decVariable(self):
+        # TODO: AQUI É NECESSÁRIO VERIFICAR O ESCOPO LOCAL ANTES DE CONSUMIR A IDE
         self.loggerSintax.I("_decVariable")
-        self.matchTokenType("IDE")
+        if self.scopeIDEVerification(self.globalScope, self.lookahead["value"]):
+            self.semanticErrorsHandler("DUPLICATED")
+        else:
+            self.appendToScope(scope=self.globalScope, ide=self.lookahead["value"], typeIDE=self.tempVar)
+            self.matchTokenType("IDE")
         self._dimensions()
 
     def _dimensions(self):
@@ -255,6 +267,23 @@ class SintaxSemanticAnalizer():
     def _sizeDimension(self):
         self.loggerSintax.I("_sizeDimension")
         if not self.matchTokenType("IDE", True):
+            # if self.lookahead["type"] == 'NRO':
+            #     if len(self.lookahead["value"].split(".")) == 1:
+            #         if typeOfVar == 'int':
+            #             scope[indexScope]["instantiated"] = self.lookahead["value"]
+            #             self.nextLookahead()
+            #         else:
+            #             self.semanticErrorsHandler("INCOMPATIBLE")
+            #     else:
+            #         if typeOfVar == 'real':
+            #             scope[indexScope]["instantiated"] = self.lookahead["value"]
+            #             self.nextLookahead()
+            #         else:
+            #             self.semanticErrorsHandler("INCOMPATIBLE")
+            # else:
+            #     self.saveSemanticError(incompatible, self.lookahead["value"], self.currentTokenLine)
+            #     self.nextLookahead()
+            #     self.loggerSemantic.E(self.errors[-1])
             self.matchTokenType("NRO")
 
     def _multipleVariablesLine(self):

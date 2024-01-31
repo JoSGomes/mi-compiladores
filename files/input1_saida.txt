@@ -3,10 +3,10 @@
 2. <PRE, int>
 2. <IDE, sete>
 2. <REL, =>
-2. <NRO, 4.1>
-2. <DEL, 1;>
+2. <NRO, 4>
+2. <DEL, ;>
 3. <PRE, int>
-3. <IDE, sete>
+3. <IDE, c>
 3. <REL, =>
 3. <NRO, 25>
 3. <DEL, ;>
@@ -22,7 +22,7 @@
 5. <PRE, string>
 5. <IDE, dez>
 5. <REL, =>
-5. <NRO, 2>
+5. <CAC, "2">
 5. <DEL, ;>
 6. <DEL, }>
 7. <PRE, variables>
@@ -56,8 +56,4 @@
 22. <DEL, }>
 23. <DEL, }>
 
-############ !!! Erros encontrados !!! ############
-
-2. Tipo recebido incompatível: 4.1
-3. Variável duplicada: sete
-5. Tipo recebido incompatível: 2
+############ Arquivo foi analisado com sucesso! ############

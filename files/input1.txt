@@ -1,8 +1,8 @@
 ﻿const {
-    int sete = 4.1;
-    int sete = 25;
+    int sete = 4;
+    int c = 25;
     real oito = 5.1, nove = 2.1;
-    string dez = 2;
+    string dez = "2";
 }
 variables {
 }
