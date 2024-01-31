@@ -123,7 +123,7 @@ class SintaxSemanticAnalizer():
     
     def semanticErrorsHandler(self, errorCase: str) -> None:
         match errorCase:
-            case "IMCOMPATIBLE": #Incompatível
+            case "INCOMPATIBLE": #Incompatível
                 self.saveSemanticError(incompatible, self.lookahead["value"], self.currentTokenLine)
             case "NONDECLARED": #Não declarado
                 self.saveSemanticError(nonDeclared, self.lookahead["value"], self.currentTokenLine)
