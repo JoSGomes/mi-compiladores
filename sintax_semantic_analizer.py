@@ -25,7 +25,7 @@ class SintaxSemanticAnalizer():
         self.tempVar = None
         self.globalScope = []
         self.scopeControl = []
-
+        self.actualSearchedElement = None
         self.loggerSintax = Logger("sintax_analizer")
         self.loggerSemantic = Logger("semantic_analizer")
 
@@ -84,11 +84,13 @@ class SintaxSemanticAnalizer():
             self.currentTokenLine = self.lookahead["line"]
             self.tokensCounter += 1
 
-    def scopeIDEVerification(self, scope: list, ide: str) -> bool:
+    def scopeIDEVerification(self, scope: list, ide: str) -> dict:
         for element in scope: 
             if element["identification"] == ide:
-                return True
-        return False
+                self.actualSearchedElement = element
+                return element
+        self.actualSearchedElement = None
+        return None
     
     def appendToScope(self, scope: list, ide: str, typeIDE: str, parameters: list[str] = None, constant: bool = False, instantiated: bool = None) -> None:
         scope.append(
@@ -243,6 +245,7 @@ class SintaxSemanticAnalizer():
         if not self.match("}", True):
             self._variable(scope)
             self._variables(scope)
+        
 
     def _variable(self, scope: list):
         self.loggerSintax.I("_variable")
@@ -253,7 +256,7 @@ class SintaxSemanticAnalizer():
     def _decVariable(self, scope: list):
         # TODO: AQUI É NECESSÁRIO VERIFICAR O ESCOPO LOCAL ANTES DE CONSUMIR A IDE
         self.loggerSintax.I("_decVariable")
-        if self.scopeIDEVerification(self.globalScope, self.lookahead["value"]) and self.scopeIDEVerification(self.scopeControl, self.lookahead["value"]):
+        if self.scopeIDEVerification(self.globalScope, self.lookahead["value"]) or self.scopeIDEVerification(self.scopeControl, self.lookahead["value"]):
             self.semanticErrorsHandler("DUPLICATED")
         else:
             self.appendToScope(scope=scope, ide=self.lookahead["value"], typeIDE=self.tempVar)
@@ -269,25 +272,24 @@ class SintaxSemanticAnalizer():
     
     def _sizeDimension(self):
         self.loggerSintax.I("_sizeDimension")
-        if not self.matchTokenType("IDE", True):
-            # if self.lookahead["type"] == 'NRO':
-            #     if len(self.lookahead["value"].split(".")) == 1:
-            #         if typeOfVar == 'int':
-            #             scope[indexScope]["instantiated"] = self.lookahead["value"]
-            #             self.nextLookahead()
-            #         else:
-            #             self.semanticErrorsHandler("INCOMPATIBLE")
-            #     else:
-            #         if typeOfVar == 'real':
-            #             scope[indexScope]["instantiated"] = self.lookahead["value"]
-            #             self.nextLookahead()
-            #         else:
-            #             self.semanticErrorsHandler("INCOMPATIBLE")
-            # else:
-            #     self.saveSemanticError(incompatible, self.lookahead["value"], self.currentTokenLine)
-            #     self.nextLookahead()
-            #     self.loggerSemantic.E(self.errors[-1])
-            self.matchTokenType("NRO")
+        if not self.matchTokenType("IDE", True, False):
+            if self.lookahead["type"] == 'NRO':
+                if len(self.lookahead["value"].split(".")) == 1:
+                        self.matchTokenType("NRO")
+                else:
+                    self.semanticErrorsHandler("INCOMPATIBLE")
+            else:
+                self.semanticErrorsHandler("INCOMPATIBLE")
+        else:
+            if not self.scopeIDEVerification(self,self.scopeControl, self.lookahead["value"]):    
+                if not self.scopeIDEVerification(self,self.globalScope, self.lookahead["value"]):
+                    self.semanticErrorsHandler("NONDECLARED")
+                    return
+            
+            if not self.actualSearchedElement["type"] == 'int':
+                self.semanticErrorsHandler("INCOMPATIBLE")
+                return
+            self.matchTokenType("IDE")
 
     def _multipleVariablesLine(self, scope: list):
         self.loggerSintax.I("_multipleVariablesLine")
