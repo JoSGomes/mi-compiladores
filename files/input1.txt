@@ -5,6 +5,10 @@
     string dez = "2";
 }
 variables {
+    int sete = 4;
+    int c = 25;
+    real oito = 5.1, nove = 2.1;
+    string dez = "2";
 }
 class main{
     variables {

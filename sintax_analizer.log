@@ -27328,3 +27328,363 @@ INFO: Entrou no método _methods
 
 ############ Final de uma execução ############
 
+INFO: Entrou no método _program
+INFO: Entrou no método constsBlock
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+ERROR: Na linha 5, esperava ['NRO', 'CAC', 'true', 'false'] e encontrou false.
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+ERROR: Na linha 6, esperava ['NRO', 'CAC', 'true', 'false'] e encontrou true.
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _classBlock
+INFO: Entrou no método _ideClass
+INFO: Entrou no método _main
+INFO: Entrou no método _initMain
+INFO: Entrou no método _bodyBlocks
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _objectsBlock
+INFO: Entrou no método _objects
+INFO: Entrou no método _mainMethods
+INFO: Entrou no método _mainMethodsBody
+INFO: Entrou no método _methodBody
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _objectsBlock
+INFO: Entrou no método _objects
+INFO: Entrou no método _commandsMethodBody
+INFO: Entrou no método _commands
+INFO: Entrou no método _methods
+
+############ Final de uma execução ############
+
+INFO: Entrou no método _program
+INFO: Entrou no método constsBlock
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _variable
+INFO: Entrou no método _decVariable
+INFO: Entrou no método _dimensions
+INFO: Entrou no método _multipleVariablesLine
+ERROR: Na linha 8, esperava [';', ','] e encontrou =.
+INFO: Entrou no método _variables
+INFO: Entrou no método _variable
+INFO: Entrou no método _decVariable
+ERROR: Na linha 8, esperava IDE e encontrou 4.
+INFO: Entrou no método _dimensions
+INFO: Entrou no método _multipleVariablesLine
+INFO: Entrou no método _variables
+INFO: Entrou no método _variable
+INFO: Entrou no método _decVariable
+INFO: Entrou no método _dimensions
+INFO: Entrou no método _multipleVariablesLine
+ERROR: Na linha 9, esperava [';', ','] e encontrou =.
+INFO: Entrou no método _variables
+INFO: Entrou no método _variable
+INFO: Entrou no método _decVariable
+ERROR: Na linha 9, esperava IDE e encontrou 25.
+INFO: Entrou no método _dimensions
+INFO: Entrou no método _multipleVariablesLine
+INFO: Entrou no método _variables
+INFO: Entrou no método _variable
+INFO: Entrou no método _decVariable
+INFO: Entrou no método _dimensions
+INFO: Entrou no método _multipleVariablesLine
+ERROR: Na linha 10, esperava [';', ','] e encontrou =.
+INFO: Entrou no método _variables
+INFO: Entrou no método _variable
+INFO: Entrou no método _decVariable
+ERROR: Na linha 10, esperava IDE e encontrou 5.1.
+INFO: Entrou no método _dimensions
+INFO: Entrou no método _multipleVariablesLine
+INFO: Entrou no método _decVariable
+INFO: Entrou no método _dimensions
+INFO: Entrou no método _multipleVariablesLine
+ERROR: Na linha 10, esperava [';', ','] e encontrou =.
+INFO: Entrou no método _variables
+INFO: Entrou no método _variable
+INFO: Entrou no método _decVariable
+ERROR: Na linha 10, esperava IDE e encontrou 2.1.
+INFO: Entrou no método _dimensions
+INFO: Entrou no método _multipleVariablesLine
+INFO: Entrou no método _variables
+INFO: Entrou no método _variable
+INFO: Entrou no método _decVariable
+INFO: Entrou no método _dimensions
+INFO: Entrou no método _multipleVariablesLine
+ERROR: Na linha 11, esperava [';', ','] e encontrou =.
+INFO: Entrou no método _variables
+INFO: Entrou no método _variable
+INFO: Entrou no método _decVariable
+ERROR: Na linha 11, esperava IDE e encontrou "2".
+INFO: Entrou no método _dimensions
+INFO: Entrou no método _multipleVariablesLine
+INFO: Entrou no método _variables
+INFO: Entrou no método _classBlock
+INFO: Entrou no método _ideClass
+INFO: Entrou no método _main
+INFO: Entrou no método _initMain
+INFO: Entrou no método _bodyBlocks
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _objectsBlock
+INFO: Entrou no método _objects
+INFO: Entrou no método _mainMethods
+INFO: Entrou no método _mainMethodsBody
+INFO: Entrou no método _methodBody
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _objectsBlock
+INFO: Entrou no método _objects
+INFO: Entrou no método _commandsMethodBody
+INFO: Entrou no método _commands
+INFO: Entrou no método _methods
+
+############ Final de uma execução ############
+
+INFO: Entrou no método _program
+INFO: Entrou no método constsBlock
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+ERROR: Na linha 5, esperava ['NRO', 'CAC', 'true', 'false'] e encontrou false.
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+ERROR: Na linha 6, esperava ['NRO', 'CAC', 'true', 'false'] e encontrou true.
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _classBlock
+INFO: Entrou no método _ideClass
+INFO: Entrou no método _main
+INFO: Entrou no método _initMain
+INFO: Entrou no método _bodyBlocks
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _objectsBlock
+INFO: Entrou no método _objects
+INFO: Entrou no método _mainMethods
+INFO: Entrou no método _mainMethodsBody
+INFO: Entrou no método _methodBody
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _objectsBlock
+INFO: Entrou no método _objects
+INFO: Entrou no método _commandsMethodBody
+INFO: Entrou no método _commands
+INFO: Entrou no método _methods
+
+############ Final de uma execução ############
+
+INFO: Entrou no método _program
+INFO: Entrou no método constsBlock
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+ERROR: Na linha 5, esperava ['NRO', 'CAC', 'true', 'false'] e encontrou false.
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+ERROR: Na linha 6, esperava ['NRO', 'CAC', 'true', 'false'] e encontrou true.
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _classBlock
+INFO: Entrou no método _ideClass
+INFO: Entrou no método _main
+INFO: Entrou no método _initMain
+INFO: Entrou no método _bodyBlocks
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _objectsBlock
+INFO: Entrou no método _objects
+INFO: Entrou no método _mainMethods
+INFO: Entrou no método _mainMethodsBody
+INFO: Entrou no método _methodBody
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _objectsBlock
+INFO: Entrou no método _objects
+INFO: Entrou no método _commandsMethodBody
+INFO: Entrou no método _commands
+INFO: Entrou no método _methods
+
+############ Final de uma execução ############
+
+INFO: Entrou no método _program
+INFO: Entrou no método constsBlock
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+ERROR: Na linha 5, esperava ['NRO', 'CAC', 'true', 'false'] e encontrou false.
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método const
+INFO: Entrou no método _constAttribution
+INFO: Entrou no método _attribution
+ERROR: Na linha 6, esperava ['NRO', 'CAC', 'true', 'false'] e encontrou true.
+INFO: Entrou no método _multipleConsts
+INFO: Entrou no método consts
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _classBlock
+INFO: Entrou no método _ideClass
+INFO: Entrou no método _main
+INFO: Entrou no método _initMain
+INFO: Entrou no método _bodyBlocks
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _objectsBlock
+INFO: Entrou no método _objects
+INFO: Entrou no método _mainMethods
+INFO: Entrou no método _mainMethodsBody
+INFO: Entrou no método _methodBody
+INFO: Entrou no método _variablesBlock
+INFO: Entrou no método _variables
+INFO: Entrou no método _objectsBlock
+INFO: Entrou no método _objects
+INFO: Entrou no método _commandsMethodBody
+INFO: Entrou no método _commands
+INFO: Entrou no método _methods
+
+############ Final de uma execução ############
+

@@ -180,7 +180,7 @@ class SintaxSemanticAnalizer():
             if self.scopeIDEVerification(scope, self.lookahead["value"]):
                 self.semanticErrorsHandler("DUPLICATED")
             else:
-                self.appendToScope(scope=scope, ide=self.lookahead["value"], typeIDE=self.tempVar)
+                self.appendToScope(scope=scope, ide=self.lookahead["value"], typeIDE=self.tempVar, constant=True)
                 self.matchTokenType("IDE")
 
         self.match("=")
