@@ -139,10 +139,11 @@ class SintaxSemanticAnalizer():
     #TODO: Realizar busca de identificadores globais na tabela;
     #TODO: Realizar a busca de identificadores locais;
     #TODO: Verificar a questão se os métodos já estão certos;
+    #TODO: Parei em dimensions, testar se o escopo local está funcionando para o que está feito 31/01 21:55 
     def _program(self):
         self.loggerSintax.I("_program")
         self._constsBlock()
-        self._variablesBlock()
+        self._variablesBlock(self.globalScope)
         self._classBlock()
 
     #----------------------------------------------------------------
@@ -164,7 +165,7 @@ class SintaxSemanticAnalizer():
         self.loggerSintax.I("consts")
         if not self.match("}", True):
             self._const(scope)
-            self._consts()
+            self._consts(scope)
 
     def _const(self, scope: list):
         self.loggerSintax.I("const")
@@ -173,13 +174,13 @@ class SintaxSemanticAnalizer():
         self._constAttribution(scope)
         self._multipleConsts(scope)
 
-    def _constAttribution(self):
+    def _constAttribution(self, scope: list):
         self.loggerSintax.I("_constAttribution")
         if self.matchTokenType("IDE", True, False):
-            if self.scopeIDEVerification(self.globalScope, self.lookahead["value"]):
+            if self.scopeIDEVerification(scope, self.lookahead["value"]):
                 self.semanticErrorsHandler("DUPLICATED")
             else:
-                self.appendToScope(scope=self.globalScope, ide=self.lookahead["value"], typeIDE=self.tempVar)
+                self.appendToScope(scope=scope, ide=self.lookahead["value"], typeIDE=self.tempVar)
                 self.matchTokenType("IDE")
 
         self.match("=")
@@ -220,40 +221,42 @@ class SintaxSemanticAnalizer():
             else:
                 self.semanticErrorsHandler("INCOMPATIBLE")
 
-    def _multipleConsts(self):
+    def _multipleConsts(self, scope: list):
         self.loggerSintax.I("_multipleConsts")
         if not self.match(";", True):
             self.match(",")
-            self._constAttribution()
-            self._multipleConsts() 
+            self._constAttribution(scope)
+            self._multipleConsts(scope) 
 
     #----------------------------------------------------------------
     
-    def _variablesBlock(self):
+    def _variablesBlock(self, scope: list = []):
         self.loggerSintax.I("_variablesBlock")
+        if len(scope) == 0:
+            scope = self.scopeControl
         self.match("variables")
         self.match("{")
-        self._variables()
+        self._variables(scope)
 
-    def _variables(self):
+    def _variables(self, scope: list):
         self.loggerSintax.I("_variables")
         if not self.match("}", True):
-            self._variable()
-            self._variables()
+            self._variable(scope)
+            self._variables(scope)
 
-    def _variable(self):
+    def _variable(self, scope: list):
         self.loggerSintax.I("_variable")
         self._type()
-        self._decVariable()         
-        self._multipleVariablesLine()
+        self._decVariable(scope)         
+        self._multipleVariablesLine(scope)
 
-    def _decVariable(self):
+    def _decVariable(self, scope: list):
         # TODO: AQUI É NECESSÁRIO VERIFICAR O ESCOPO LOCAL ANTES DE CONSUMIR A IDE
         self.loggerSintax.I("_decVariable")
         if self.scopeIDEVerification(self.globalScope, self.lookahead["value"]) and self.scopeIDEVerification(self.scopeControl, self.lookahead["value"]):
             self.semanticErrorsHandler("DUPLICATED")
         else:
-            self.appendToScope(scope=self.globalScope, ide=self.lookahead["value"], typeIDE=self.tempVar)
+            self.appendToScope(scope=scope, ide=self.lookahead["value"], typeIDE=self.tempVar)
             self.matchTokenType("IDE")
         self._dimensions()
 
@@ -286,13 +289,13 @@ class SintaxSemanticAnalizer():
             #     self.loggerSemantic.E(self.errors[-1])
             self.matchTokenType("NRO")
 
-    def _multipleVariablesLine(self):
+    def _multipleVariablesLine(self, scope: list):
         self.loggerSintax.I("_multipleVariablesLine")
         if self.match(";", True):
             return
         elif self.match(",", True):
-            self._decVariable()
-            self._multipleVariablesLine()
+            self._decVariable(scope)
+            self._multipleVariablesLine(scope)
             return
         
         self.saveError([";", ","], self.lookahead["value"], self.currentTokenLine)
