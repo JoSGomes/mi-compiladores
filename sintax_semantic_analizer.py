@@ -92,7 +92,7 @@ class SintaxSemanticAnalizer():
             return self.currentSearchedElement
         return None
     
-    def appendToScope(self, scope: list, ide: str, idx: int = 0, typeIDE: str = None, parameters: list[dict] = None, constant: bool = False, instantiated: str = None, isClass: bool = False, inheritance: str = None) -> None: 
+    def appendToScope(self, scope: list, ide: str, idx: int = 0, typeIDE: str = None, parameters: dict = dict(), constant: bool = False, instantiated: str = None, isClass: bool = False, inheritance: str = None) -> None: 
         if len(scope) == 0: # Criando o primeiro escopo.
             artifact = {}
             artifact[ide] = {
@@ -102,9 +102,9 @@ class SintaxSemanticAnalizer():
                 "instantiated": instantiated,   # Nome da classe que instanciou.
                 "constant": constant,           # É constante?
                 "inheritance": inheritance,     # Nome da classe que está herdando.
-                "variables": list,              # Lista de nomes das variáveis.
-                "objects": list,                # Lista de nomes dos objetos.
-                "methods": list                 # Lista de nomes dos metodos.
+                "variables": list(),              # Lista de nomes das variáveis.
+                "objects": list(),                # Lista de nomes dos objetos.
+                "methods": list()                 # Lista de nomes dos metodos.
             }
             scope.append(artifact)
         else: # Colocando em um escopo específico
@@ -115,9 +115,9 @@ class SintaxSemanticAnalizer():
                 "instantiated": instantiated,   # Nome da classe que instanciou.
                 "constant": constant,           # É constante?
                 "inheritance": inheritance,     # Nome da classe que está herdando.
-                "variables": list,              # Lista de nomes das variáveis.
-                "objects": list,                # Lista de nomes dos objetos.
-                "methods": list                 # Lista de nomes dos metodos.
+                "variables": list(),              # Lista de nomes das variáveis.
+                "objects": list(),                # Lista de nomes dos objetos.
+                "methods": list()                 # Lista de nomes dos metodos.
             }
 
     
@@ -155,11 +155,9 @@ class SintaxSemanticAnalizer():
         self.loggerSemantic.E(self.errors[-1])
 
     #----------------------------------------------------------------
-    #TODO: Inserir os identificadores locais;
-    #TODO: Realizar busca de identificadores globais na tabela;
-    #TODO: Realizar a busca de identificadores locais;
-    #TODO: Verificar a questão se os métodos já estão certos;
-    #TODO: Parei em dimensions, testar se o escopo local está funcionando para o que está feito 31/01 21:55 
+    # TODO: Parâmetros dos métodos
+    # TODO: Salvar o escopos locais depois de terminá-los?
+
     def _program(self):
         self.loggerSintax.I("_program")
         self._constsBlock()
@@ -253,8 +251,6 @@ class SintaxSemanticAnalizer():
     
     def _variablesBlock(self, idx: int = 0, scope: list = [], ):
         self.loggerSintax.I("_variablesBlock")
-        if len(scope) == 0: 
-            scope = self.scopeControl
         self.match("variables")
         self.match("{")
         self._variables(scope, idx)
@@ -453,9 +449,11 @@ class SintaxSemanticAnalizer():
             self._multDecParametersConstructor()
             return
         
-    def _variableParam(self):
+    def _variableParam(self, scope: list, idx: int, ide: str):
         self.loggerSintax.I("_variableParam")
+        self.tempVar = self.lookahead["value"]
         self.match(typesVar)
+        scope[idx][ide]["parameters"][self.lookahead["value"]] = self.tempVar
         self.matchTokenType('IDE')
 
     def _objectParam(self):
@@ -482,13 +480,17 @@ class SintaxSemanticAnalizer():
     def _method(self):
         self.loggerSintax.I("_method")
         self._types()
+        self.globalScope[0][self.currentClassDefinition]["methods"].append(self.lookahead["value"])
+        self.appendToScope(scope=self.scopeControl, idx=0, ide=self.lookahead["value"], typeIDE=self.tempVar)
         self.matchTokenType('IDE')
         self.match('(')
-        self._decParameters()
+        self._decParameters(self.scopeControl, 0, self.lookahead["value"])
 
     def _types(self):
         self.loggerSintax.I("types")
-        if self.match('void', True, True):
+        if self.match('void', True, False):
+            self.tempVar = self.lookahead["value"]
+            self.match('void')
             return
         elif self.match(typesVar + ['IDE'], True, False):
             self._typesVariables()
@@ -500,27 +502,31 @@ class SintaxSemanticAnalizer():
 
     def _typesVariables(self):
         self.loggerSintax.I("_typesVariables")
-        if self.match(typesVar, True, True):
+        if self.match(typesVar, True, False):
+            self.tempVar = self.lookahead["value"]
+            self.match(typesVar)
             return
-        elif self.matchTokenType('IDE', True, True):
+        elif self.matchTokenType('IDE', True, False):  
+            self.tempVar = self.lookahead["value"]
+            self.matchTokenType('IDE')
             return
         
         self.saveError(typesVar + 'IDE', self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
         self.loggerSintax.E(self.errors[-1])
 
-    def _decParameters(self):
+    def _decParameters(self, scope: list, idx: int, ide: str):
         self.loggerSintax.I("_decParameters")
         if self.match(typesVar, True, False):
-            self._variableParam()
-            self._multDecParameters()#
+            self._variableParam(scope, idx, ide)
+            self._multDecParameters(scope, idx, ide)#
         elif self.matchTokenType('IDE', True, False):
-            self._objectParam()
-            self._multDecParameters()
+            self._objectParam(scope, idx, ide)
+            self._multDecParameters(scope, idx, ide)
         elif self.match(')', True, False):
             self._endDecParameters()#
 
-    def _multDecParameters(self):
+    def _multDecParameters(self, scope: list, idx: int, ide: str):
         self.loggerSintax.I("_multDecParameters")
         if self.match(',', True, True):
             self._typesVariables()
@@ -561,8 +567,8 @@ class SintaxSemanticAnalizer():
 
     def _bodyBlocks(self):
         self.loggerSintax.I("_bodyBlocks")
-        self._variablesBlock(0, self.scopeControl)
-        self._objectsBlock(0, self.scopeControl) 
+        self._variablesBlock(idx=0, scope=self.scopeControl)
+        self._objectsBlock(idx=0, scope=self.scopeControl) 
 
     def _mainMethods(self):
         self.loggerSintax.I("_mainMethods")

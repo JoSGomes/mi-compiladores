@@ -14,7 +14,7 @@ class test{
     objects {
     }
     methods{ 
-        void tst(){
+        void tst(int b){
             variables {
             }
             objects {
@@ -23,6 +23,8 @@ class test{
         } 
     }
     constructor () {
+        variables{}
+        objects{}
     }
 }
 
@@ -64,6 +66,8 @@ class teste extends test{
         } 
     }
     constructor () {
+        variables{}
+        objects{}
     }
 }
 
