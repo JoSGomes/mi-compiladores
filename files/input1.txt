@@ -5,11 +5,68 @@
     string dez = "2";
 }
 variables {
-    int sete = 4;
-    int c = 25;
-    real oito = 5.1, nove = 2.1;
-    string dez = "2";
+    int tamanho;
+    int c[tamanho];
 }
+class test{
+    variables {
+    }
+    objects {
+    }
+    methods{ 
+        void tst(){
+            variables {
+            }
+            objects {
+            }
+            return;
+        } 
+    }
+    constructor () {
+    }
+}
+
+class a extends a{
+    variables{}
+    
+    objects {
+        Pessoa pessoa[100];
+        Livro livro[tamanho];
+    }
+    
+    methods{
+        int metodo1(int a){
+            variables {}
+            objects {}
+
+            return a; 
+        }
+    }   
+    constructor (Math math, int a) {
+        variables{}
+        objects{}
+        a = b+2;
+    }
+}
+
+class teste extends test{
+    variables {
+    }
+    objects {
+    }
+    methods{ 
+        void tst(){
+            variables {
+            }
+            objects {
+            }
+            return;
+        } 
+    }
+    constructor () {
+    }
+}
+
 class main{
     variables {
     }
