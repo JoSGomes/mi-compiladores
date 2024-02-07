@@ -14,13 +14,14 @@ class test{
     objects {
     }
     methods{ 
-        void tst(int b){
+        void tst(int b, bool a, int d){
             variables {
             }
             objects {
             }
             return;
-        } 
+        }
+        
     }
     constructor () {
         variables{}
