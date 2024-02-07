@@ -10,10 +10,20 @@ variables {
 }
 class test{
     variables {
+        int b;
     }
     objects {
+        Pessoa p;
     }
     methods{ 
+        void tst(int b, bool a, int d){
+            variables {
+                int treze;
+            }
+            objects {
+            }
+            return;
+        }
         void tst(int b, bool a, int d){
             variables {
             }
@@ -21,7 +31,6 @@ class test{
             }
             return;
         }
-        
     }
     constructor () {
         variables{}
