@@ -21,14 +21,10 @@ class test{
                 int treze;
             }
             objects {
+                Pessoa pessoinha;
             }
-            return;
-        }
-        void tst(int b, bool a, int d){
-            variables {
-            }
-            objects {
-            }
+
+            treze = 3.1;
             return;
         }
     }
@@ -54,7 +50,7 @@ class a extends a{
             return a; 
         }
     }   
-    constructor (Math math, int a) {
+    constructor () {
         variables{}
         objects{}
         a = b+2;
