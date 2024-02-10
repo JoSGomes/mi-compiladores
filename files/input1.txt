@@ -24,16 +24,21 @@ class test{
                 Pessoa pessoinha;
             }
 
-            treze = 3.1;
+            this.b = 3;
             return;
         }
     }
-    constructor () {
-        variables{}
-        objects{}
+    constructor (int a, int b, bool c) {
+        variables{
+           boolean umteste;
+           int contador;
+        }
+        objects{
+            Pessoa pessoinha;
+            Teste i123;
+        }
     }
 }
-
 class a extends a{
     variables{}
     
