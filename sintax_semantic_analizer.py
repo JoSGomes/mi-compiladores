@@ -33,6 +33,8 @@ class SintaxSemanticAnalizer():
         self.currentAttribuition = None
         self.indexScopeSeeing = 0
 
+        self.currentPathAttributeAccess = list()
+        
         self.loggerSintax = Logger("sintax_analizer")
         self.loggerSemantic = Logger("semantic_analizer")
 
@@ -310,6 +312,7 @@ class SintaxSemanticAnalizer():
                 self.semanticErrorsHandler("NONDECLARED")
                 self.tempVar = None
             else:
+                self.currentPathAttributeAccess.append(self.lookahead["value"])
                 self.matchTokenType("IDE")
         self._dimensions()
 
@@ -800,6 +803,8 @@ class SintaxSemanticAnalizer():
         self.loggerSintax.I("_objectAccessOrAssignment")
         self._decObjectAttributeAccess()
         self._objectAccessOrAssigmentEnd()
+        self.currentAttributeAccess = None
+        self.currentPathAttributeAccess = list()
 
     def _objectAccessOrAssigmentEnd(self):
         self.loggerSintax.I("_objectAccessOrAssigmentEnd")
@@ -829,9 +834,11 @@ class SintaxSemanticAnalizer():
                     self.semanticErrorsHandler("NONDECLARED")
                 else:
                     self.currentAttributeAccess = self.lookahead["value"]
+                    self.currentPathAttributeAccess.append(self.currentAttributeAccess)
                     self.matchTokenType('IDE')
             else:
                 self.currentAttributeAccess = "this"
+                self.currentPathAttributeAccess.append(self.currentAttributeAccess)
                 self.match('this')
 
             self._dimensions()
@@ -844,7 +851,7 @@ class SintaxSemanticAnalizer():
 
     def _multipleObjectAttributeAccess(self):
         self.loggerSintax.I("_multipleObjectAttributeAccess")
-        self._decVariable(scope=self.scopeControl, idx=0, belongsTo=self.currentClassDefinition) # TODO: PAREI AQUI 12:34 10/02
+        self._decVariable(scope=self.scopeControl, idx=0, belongsTo=self.currentClassDefinition)
         self._endObjectAttributeAccess()
 
     def _objectMethodOrObjectAccess(self):
@@ -873,7 +880,11 @@ class SintaxSemanticAnalizer():
         self.loggerSintax.I("_ideOrConstructor")
         if self.match('constructor', True):
             return
-        elif self.matchTokenType('IDE', True):
+        elif self.matchTokenType('IDE', True, False):
+            if self.currentAttributeAccess == "this":
+                self.currentPathAttributeAccess.remove("this")
+                for artifact in self.currentPathAttributeAccess:
+                    self.scopeControl[0]
             return
         self.saveError(['constructor', 'IDE'], self.lookahead["value"], self.currentTokenLine)
         self.nextLookahead()
@@ -885,10 +896,65 @@ class SintaxSemanticAnalizer():
             self._value()
             self._multParameters()
     
-    def _value(self):
+    def _value(self):#TODO: Falta relizar o teste do acesso em objetos até o seu tipo primário.
         self.loggerSintax.I("_value")
-        if self.matchTokenType('NRO', True, True):
-            self._simpleOrDoubleArithimeticExpressionOptional()
+        if self.matchTokenType('NRO', True, False):
+            i = 0
+            if self.currentAttributeAccess == "this":
+                self.currentPathAttributeAccess.remove("this")
+                for artifact in self.currentPathAttributeAccess:   
+                    if i == 0:
+                        if artifact in self.globalScope[0][self.currentClassDefinition]["variables"].keys():
+                            primaryType = self.globalScope[0][self.currentClassDefinition]["variables"][artifact]
+                        elif artifact in self.globalScope[0][self.currentClassDefinition]["objects"].keys():
+                            objectType = self.globalScope[0][self.currentClassDefinition]["objects"][artifact]
+                    elif objectType:
+                        if artifact in self.globalScope[0][objectType]["variables"].keys():
+                            primaryType = self.globalScope[0][objectType]["variables"][artifact]
+                        elif artifact in self.globalScope[0][objectType]["objects"].keys():
+                            objectType = self.globalScope[0][objectType]["objects"][artifact]
+
+                    if primaryType:
+                        if len(self.currentPathAttributeAccess) > i + 1:
+                            self.semanticErrorsHandler("INCOMPATIBLE") # O proximo seria uma tentativa de acessar um tipo primário através de um tipo primário
+                        else:
+                            self._simpleOrDoubleArithimeticExpressionOptional(primaryType)
+                    i += 1
+            else:
+                for artifact in self.currentPathAttributeAccess:
+                    if i == 0:
+                        if artifact in self.scopeControl[0][self.currentMethodDefinition]["variables"].keys():
+                            primaryType = self.scopeControl[0][self.currentMethodDefinition]["variables"][artifact]
+                        elif artifact in self.scopeControl[0][self.currentMethodDefinition]["objects"].key():
+                            objectType = self.scopeControl[0][self.currentMethodDefinition]["objects"][artifact]
+                    elif objectType:
+                        if artifact in self.globalScope[0][objectType]["variables"].keys():
+                            primaryType = self.globalScope[0][objectType]["variables"][artifact]
+                        elif artifact in self.globalScope[0][objectType]["objects"].key():
+                            objectType = self.globalScope[0][objectType]["objects"][artifact]
+                    
+                    if primaryType:
+                        if len(self.currentPathAttributeAccess) > i + 1:
+                            self.semanticErrorsHandler("INCOMPATIBLE") # O proximo seria uma tentativa de acessar um tipo primário através de um tipo primário
+                        else:
+                            self._simpleOrDoubleArithimeticExpressionOptional(primaryType) # TODO: analisar dentro dessa função o tipo com os outros que poderem existir
+                            
+                    i += 1
+
+            if len(self.currentPathAttributeAccess) == i + 1:
+                self.semanticErrorsHandler("NONDECLARED")
+            else:
+                if len(self.lookahead["value"].split(".")) == 1:
+                    if primaryType == 'int':
+                        self.nextLookahead()
+                    else:
+                        self.semanticErrorsHandler("INCOMPATIBLE")
+                else:
+                    if primaryType == 'real':
+                        self.nextLookahead()
+                    else:
+                        self.semanticErrorsHandler("INCOMPATIBLE")
+
             return
         elif self.matchTokenType('CAC', True, True):
             return
@@ -912,7 +978,7 @@ class SintaxSemanticAnalizer():
         self.nextLookahead()
         self.loggerSintax.E(self.errors[-1])
     
-    def _simpleOrDoubleArithimeticExpressionOptional(self):
+    def _simpleOrDoubleArithimeticExpressionOptional(self, primaryType: str):
         self.loggerSintax.I("_simpleOrDoubleArithimeticExpressionOptional")
         if self.matchTokenType('ART', True, False):
             self._simpleOrDoubleArithimeticExpression()

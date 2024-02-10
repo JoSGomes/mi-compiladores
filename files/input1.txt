@@ -24,7 +24,7 @@ class test{
                 Pessoa pessoinha;
             }
 
-            this.b = 3;
+            this.b = 3.1;
             return;
         }
     }
