@@ -21,7 +21,7 @@ class Pessoa{
             variables {}
             objects {}
 
-            return a; 
+            return 5; 
         }
     }   
     constructor () {

@@ -598,7 +598,7 @@ class SintaxSemanticAnalizer():
         self.loggerSintax.I("_endDecParameters")
         self.match(')')
         self.match('{')
-        self._methodBody(scope, idx, ide)
+        self._methodBody()
 
     #----------------------------------------------------------------
     def _main(self):
@@ -642,7 +642,7 @@ class SintaxSemanticAnalizer():
         self._methodBody()
         self._methods()
     
-    def _methodBody(self, scope: list, idx: int, ide: str): 
+    def _methodBody(self): 
         self.loggerSintax.I("_methodBody")
         self._variablesBlock(scope=self.scopeControl, idx=0, belongsTo=self.currentMethodDefinition)
         self._objectsBlock(scope=self.scopeControl, idx=0, belongsTo=self.currentMethodDefinition)
@@ -881,9 +881,9 @@ class SintaxSemanticAnalizer():
                         if i == 0:
                             if artifact in self.scopeControl[0][self.currentMethodDefinition]["variables"].keys():
                                 primaryReturnType = self.scopeControl[0][self.currentMethodDefinition]["variables"][artifact]
-                            elif artifact in self.scopeControl[0][self.currentMethodDefinition]["objects"].key():
+                            elif artifact in self.scopeControl[0][self.currentMethodDefinition]["objects"].keys():
                                 objectReturnType = self.scopeControl[0][self.currentMethodDefinition]["objects"][artifact]
-                            elif artifact in self.scopeControl[0][self.currentMethodDefinition]["parameters"].key():
+                            elif artifact in self.scopeControl[0][self.currentMethodDefinition]["parameters"].keys():
                                 if self.scopeControl[0][self.currentMethodDefinition]["parameters"][artifact] in typesVar:
                                     primaryReturnType = self.scopeControl[0][self.currentMethodDefinition]["parameters"][artifact]
                                 else:
@@ -895,7 +895,7 @@ class SintaxSemanticAnalizer():
                         elif objectReturnType:
                             if artifact in self.globalScope[0][objectReturnType]["variables"].keys():
                                 primaryReturnType = self.globalScope[0][objectReturnType]["variables"][artifact]
-                            elif artifact in self.globalScope[0][objectReturnType]["objects"].key():
+                            elif artifact in self.globalScope[0][objectReturnType]["objects"].keys():
                                 objectReturnType = self.globalScope[0][objectReturnType]["objects"][artifact]
                         
                         if primaryReturnType:
@@ -997,8 +997,13 @@ class SintaxSemanticAnalizer():
                     if i == 0:
                         if artifact in self.scopeControl[0][self.currentMethodDefinition]["variables"].keys():
                             primaryType = self.scopeControl[0][self.currentMethodDefinition]["variables"][artifact]
-                        elif artifact in self.scopeControl[0][self.currentMethodDefinition]["objects"].key():
+                        elif artifact in self.scopeControl[0][self.currentMethodDefinition]["objects"].keys():
                             objectType = self.scopeControl[0][self.currentMethodDefinition]["objects"][artifact]
+                        elif artifact in self.scopeControl[0][self.currentMethodDefinition]["parameters"].keys():
+                            if self.scopeControl[0][self.currentMethodDefinition]["parameters"][artifact] in typesVar:
+                                primaryType = self.scopeControl[0][self.currentMethodDefinition]["parameters"][artifact]
+                            else:
+                                objectType = self.scopeControl[0][self.currentMethodDefinition]["parameters"][artifact]
                         elif artifact in self.globalScope[0][self.currentClassDefinition]["variables"].keys():
                             primaryType = self.globalScope[0][self.currentClassDefinition]["variables"][artifact]
                         elif artifact in self.globalScope[0][self.currentClassDefinition]["objects"].keys():
