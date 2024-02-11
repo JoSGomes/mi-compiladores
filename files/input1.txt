@@ -8,43 +8,33 @@ variables {
     int tamanho;
     int c[tamanho];
 }
-class test{
-    variables {
-        int b;
-    }
-    objects {
-        Pessoa p;
-    }
-    methods{ 
-        void tst(int b, bool a, int d){
-            variables {
-                int treze;
-            }
-            objects {
-                Pessoa pessoinha;
-            }
 
-            this.b = 3.1;
-            return;
-        }
+class Pessoa{
+    variables{
+        int idade;
     }
-    constructor (int a, int b, bool c) {
-        variables{
-           boolean umteste;
-           int contador;
+    
+    objects {}
+    
+    methods{
+        int metodo1(int a){
+            variables {}
+            objects {}
+
+            return a; 
         }
-        objects{
-            Pessoa pessoinha;
-            Teste i123;
-        }
+    }   
+    constructor () {
+        variables{}
+        objects{}
     }
 }
-class a extends a{
+
+class A {
     variables{}
     
     objects {
-        Pessoa pessoa[100];
-        Livro livro[tamanho];
+        Pessoa pessoa;
     }
     
     methods{
@@ -62,23 +52,35 @@ class a extends a{
     }
 }
 
-class teste extends test{
+class test{
     variables {
+        int b;
     }
     objects {
+        A a;
     }
     methods{ 
-        void tst(){
+        void tst(int b, bool a, int d){
             variables {
+                int treze;
             }
             objects {
+                Pessoa pessoinha;
             }
+
+            this.a.pessoa.idade = 3 + this.a.pessoa.idade;
             return;
-        } 
+        }
     }
-    constructor () {
-        variables{}
-        objects{}
+    constructor (int a, int b, bool c) {
+        variables{
+           boolean umteste;
+           int contador;
+        }
+        objects{
+            Pessoa pessoinha;
+            Teste i123;
+        }
     }
 }
 
