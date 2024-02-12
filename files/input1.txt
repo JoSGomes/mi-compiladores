@@ -18,10 +18,12 @@ class Pessoa{
     
     methods{
         int metodo1(int a){
-            variables {}
+            variables {
+                string b;
+            }
             objects {}
-
-            return 5; 
+            a = 2 * 3.1;
+            return [3,1,4,a]; 
         }
     }   
     constructor () {
@@ -39,8 +41,11 @@ class A {
     
     methods{
         int metodo1(int a){
-            variables {}
+            variables {
+                real b;
+            }
             objects {}
+            b++;
 
             return a; 
         }
