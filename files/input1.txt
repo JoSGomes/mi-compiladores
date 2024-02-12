@@ -17,12 +17,25 @@ class Pessoa{
     objects {}
     
     methods{
-        int metodo1(int a){
+        boolean metodo1(int a){
             variables {
                 string b;
+                boolean teste;
+                int i;
             }
             objects {}
-            a = 2 * 3.1;
+            a = 2 / 3;
+            read(a);
+
+            if ( (teste) && (a > 2)) then {
+                a = 2 * 2;
+            } else {
+                a = 2 * 3;
+            }
+             for(i=1;i>=10;i=i+1){
+                this.idade = 5;
+            }
+
             return [3,1,4,a]; 
         }
     }   
@@ -45,15 +58,24 @@ class A {
                 real b;
             }
             objects {}
-            b++;
+            a++;
+
+            if (this.pessoa->metodo1(a)) then {
+                a = 2 * 2;
+            } else {
+                a = 2 * 3;
+            }
 
             return a; 
         }
     }   
     constructor () {
-        variables{}
-        objects{}
-        a = b+2;
+        variables{
+            int a;
+            int b;
+        }
+        objects{
+        }
     }
 }
 
@@ -73,8 +95,6 @@ class test{
                 Pessoa pessoinha;
             }
 
-            this.a.pessoa.idade = 3 + this.a.pessoa.idade;
-            return;
         }
     }
     constructor (int a, int b, bool c) {
