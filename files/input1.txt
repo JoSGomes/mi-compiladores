@@ -62,7 +62,7 @@ class A {
             objects {}
             a++;
 
-            if (this.pessoa->metodo1(a)) then {
+            if (this.pessoa->metodo1(b)) then {
                 a = 2 * 2;
             } else {
                 a = 2 * 3;

@@ -219,7 +219,7 @@
 65. <DEL, ->>
 65. <IDE, metodo1>
 65. <DEL, (>
-65. <IDE, a>
+65. <IDE, b>
 65. <DEL, )>
 65. <DEL, )>
 65. <PRE, then>
@@ -369,4 +369,6 @@
 127. <DEL, }>
 128. <DEL, }>
 
-############ Arquivo foi analisado com sucesso! ############
+############ !!! Erros encontrados !!! ############
+
+65. Excesso de Parâmetros, quantidade esperada:  1

@@ -1031,9 +1031,13 @@ class SintaxSemanticAnalizer():
         if self.currentParametersMethodAccess:
             for key in self.currentParametersMethodAccess.keys():
                 if key in self.currentParametersMethodAccess:
-                    if not self.currentParametersMethodAccess[key] == primaryType:
-                        self.semanticErrorsHandler("INCOMPATIBLE")
+                    if not self.currentParametersMethodAccess[key] == primaryType and primaryType != None:
+                        self.saveSemanticError("Excesso de Parâmetros, quantidade esperada: ", len(self.currentParametersMethodAccess.keys()), self.currentTokenLine)
+                        self.loggerSemantic.E(self.errors[-1])
                         return
+                    elif primaryType == None:
+                        self.saveSemanticError("Excesso de Parâmetros, quantidade esperada: ", len(self.currentParametersMethodAccess.keys()), self.currentTokenLine)
+                        self.loggerSemantic.E(self.errors[-1])
                 else:
                     self.semanticErrorsHandler("NONDECLARED")
                     return
@@ -1181,6 +1185,9 @@ class SintaxSemanticAnalizer():
         if self.match(['[', '!', '('], True, False) or self.matchTokenType(['NRO', 'CAC', 'IDE'], True, False):
             self._value()
             self._multParameters()
+        elif len(self.currentParametersMethodAccess.keys()) > 0:
+            self.saveSemanticError("Falta de Parâmetros, quantidade esperada: ", len(self.currentParametersMethodAccess.keys()), self.currentTokenLine)
+            self.loggerSemantic.E(self.errors[-1])
     
     def _value(self, returnDeFlag=False):
         self.loggerSintax.I("_value")
