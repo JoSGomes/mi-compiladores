@@ -117,18 +117,28 @@ class SintaxSemanticAnalizer():
         return globalVars
     
     def getPrimaryTypeFromAllScopes(self, ide: str) -> str:
-        if ide in self.scopeControl[0][self.currentMethodDefinition]["parameters"]:
-            return self.scopeControl[0][self.currentMethodDefinition]["parameters"][ide]
-        elif ide in self.scopeControl[0][self.currentMethodDefinition]["variables"]:
-            return self.scopeControl[0][self.currentMethodDefinition]["variables"][ide]
-        elif ide in self.scopeControl[0][self.currentMethodDefinition]["objects"]:
-            return self.scopeControl[0][self.currentMethodDefinition]["objects"][ide]
-        elif ide in self.globalScope[0][self.currentClassDefinition]["variables"]:
-            return self.globalScope[0][self.currentClassDefinition]["variables"][ide]
-        elif ide in self.globalScope[0][self.currentClassDefinition]["objects"]:
-            return self.globalScope[0][self.currentClassDefinition]["objects"][ide]
-        elif ide in self.globalScope[0]:
-            return self.globalScope[0][ide]["type"]
+        if len(self.scopeControl) > 0 and self.currentMethodDefinition != None:
+            if ide in self.scopeControl[0][self.currentMethodDefinition]["parameters"]:
+                return self.scopeControl[0][self.currentMethodDefinition]["parameters"][ide]
+            elif ide in self.scopeControl[0][self.currentMethodDefinition]["variables"]:
+                return self.scopeControl[0][self.currentMethodDefinition]["variables"][ide]
+            elif ide in self.scopeControl[0][self.currentMethodDefinition]["objects"]:
+                return self.scopeControl[0][self.currentMethodDefinition]["objects"][ide]
+        if len(self.globalScope) > 0 and self.currentClassDefinition != None:
+            if ide in self.globalScope[0][self.currentClassDefinition]["variables"]:
+                return self.globalScope[0][self.currentClassDefinition]["variables"][ide]
+            elif ide in self.globalScope[0][self.currentClassDefinition]["objects"]:
+                return self.globalScope[0][self.currentClassDefinition]["objects"][ide]
+            elif ide in self.globalScope[0]:
+                return self.globalScope[0][ide]["type"]
+        elif len(self.globalScope) > 0:
+            if ide in self.globalScope[0]:
+                return self.globalScope[0][ide]["type"]
+            elif ide in self.globalScope[0]:
+                return self.globalScope[0][ide]["type"]
+            elif ide in self.globalScope[0]:
+                return self.globalScope[0][ide]["type"]
+        return None
         
     def appendToScope(self, scope: list, ide: str, idx: int = 0, typeIDE: str = None, parameters: dict = dict(), constant: bool = False, isClass: bool = False, inheritance: str = None, belongsTo: str = None) -> None: 
         parameters = dict()
@@ -345,12 +355,11 @@ class SintaxSemanticAnalizer():
             else:
                 self.semanticErrorsHandler("INCOMPATIBLE")
         else:
-            if not self.scopeIDEVerification(self.scopeControl, self.lookahead["value"]):    
-                if not self.scopeIDEVerification(self.globalScope, self.lookahead["value"]):
-                    self.semanticErrorsHandler("NONDECLARED")
-                    return
-            
-            if not self.currentSearchedElement["type"] == 'int':
+            primaryType = self.getPrimaryTypeFromAllScopes(self.lookahead["value"])
+            if not primaryType:    
+                self.semanticErrorsHandler("NONDECLARED")
+                return          
+            elif not primaryType == 'int':
                 self.semanticErrorsHandler("INCOMPATIBLE")
                 return
             self.matchTokenType("IDE")
@@ -1263,10 +1272,87 @@ class SintaxSemanticAnalizer():
 
             return
         elif self.matchTokenType('CAC', True, False):
-            if not self.scopeControl[0][self.currentMethodDefinition]["type"] == "string":
-                self.semanticErrorsHandler("INCOMPATIBLE")
+            if self.currentAttributeAccess:
+                if self.currentAttributeAccess == "this":
+                    self.currentPathAttributeAccess.remove("this")
+                    primaryType = None
+                    objectType = None
+                    i = 0
+                    for artifact in self.currentPathAttributeAccess:   
+                        if i == 0:
+                            if artifact in self.globalScope[0][self.currentClassDefinition]["variables"].keys():
+                                primaryType = self.globalScope[0][self.currentClassDefinition]["variables"][artifact]
+                            elif artifact in self.globalScope[0][self.currentClassDefinition]["objects"].keys():
+                                objectType = self.globalScope[0][self.currentClassDefinition]["objects"][artifact]
+                            elif self.globalScope[0][self.currentClassDefinition]["inheritance"]:
+                                inheritance = self.globalScope[0][self.currentClassDefinition]["inheritance"]
+                                if artifact in self.globalScope[0][inheritance]["variables"].keys():
+                                    primaryType = self.globalScope[0][inheritance]["variables"][artifact]
+                                elif artifact in self.globalScope[0][inheritance]["objects"].keys():
+                                    objectType = self.globalScope[0][inheritance]["objects"][artifact]
+                        elif objectType:
+                            if artifact in self.globalScope[0][objectType]["variables"].keys():
+                                primaryType = self.globalScope[0][objectType]["variables"][artifact]
+                            elif artifact in self.globalScope[0][objectType]["objects"].keys():
+                                objectType = self.globalScope[0][objectType]["objects"][artifact]
+
+                        if primaryType:
+                            if len(self.currentPathAttributeAccess) > i + 1:
+                                self.semanticErrorsHandler("INCOMPATIBLE") # O proximo seria uma tentativa de acessar um tipo primário através de um tipo primário
+                            else:
+                                if not primaryType == "string":
+                                    self.semanticErrorsHandler("INCOMPATIBLE")
+                                else:
+                                    self.nextLookahead()
+                                    return
+                        i += 1
+                else:
+                    primaryType = None
+                    objectType = None
+                    for artifact in self.currentPathAttributeAccess:
+                        if i == 0:
+                            if artifact in self.scopeControl[0][self.currentMethodDefinition]["variables"].keys():
+                                primaryType = self.scopeControl[0][self.currentMethodDefinition]["variables"][artifact]
+                            elif artifact in self.scopeControl[0][self.currentMethodDefinition]["objects"].keys():
+                                objectType = self.scopeControl[0][self.currentMethodDefinition]["objects"][artifact]
+                            elif artifact in self.scopeControl[0][self.currentMethodDefinition]["parameters"].keys():
+                                if self.scopeControl[0][self.currentMethodDefinition]["parameters"][artifact] in typesVar:
+                                    primaryType = self.scopeControl[0][self.currentMethodDefinition]["parameters"][artifact]
+                                else:
+                                    objectType = self.scopeControl[0][self.currentMethodDefinition]["parameters"][artifact]
+                            elif artifact in self.globalScope[0][self.currentClassDefinition]["variables"].keys():
+                                primaryType = self.globalScope[0][self.currentClassDefinition]["variables"][artifact]
+                            elif artifact in self.globalScope[0][self.currentClassDefinition]["objects"].keys():
+                                objectType = self.globalScope[0][self.currentClassDefinition]["objects"][artifact]
+                            elif self.globalScope[0][self.currentClassDefinition]["inheritance"]:
+                                inheritance = self.globalScope[0][self.currentClassDefinition]["inheritance"]
+                                if artifact in self.globalScope[0][inheritance]["variables"].keys():
+                                    primaryType = self.globalScope[0][inheritance]["variables"][artifact]
+                                elif artifact in self.globalScope[0][inheritance]["objects"].keys():
+                                    objectType = self.globalScope[0][inheritance]["objects"][artifact] 
+                        elif objectType:
+                            if artifact in self.globalScope[0][objectType]["variables"].keys():
+                                primaryType = self.globalScope[0][objectType]["variables"][artifact]
+                            elif artifact in self.globalScope[0][objectType]["objects"].key():
+                                objectType = self.globalScope[0][objectType]["objects"][artifact]
+                        
+                        if primaryType:
+                            if len(self.currentPathAttributeAccess) > i + 1:
+                                self.semanticErrorsHandler("INCOMPATIBLE") # O proximo seria uma tentativa de acessar um tipo primário através de um tipo primário
+                            else:
+                                if not primaryType == "string":
+                                    self.semanticErrorsHandler("INCOMPATIBLE")
+                                else:
+                                    self.nextLookahead()
+                                    return
+                                
+                                
+                        i += 1
             else:
-                self.nextLookahead()
+                if not self.scopeControl[0][self.currentMethodDefinition]["type"] == "string":
+                    self.semanticErrorsHandler("INCOMPATIBLE")
+                else:
+                    self.nextLookahead()
         elif self.match('[', True, False):
             self._vectorAssignBlock()
             return

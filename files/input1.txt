@@ -6,12 +6,13 @@
 }
 variables {
     int tamanho;
-    int c[tamanho];
+    int h[tamanho];
 }
 
 class Pessoa{
     variables{
         int idade;
+        string dependentes[10];
     }
     
     objects {}
@@ -34,9 +35,10 @@ class Pessoa{
             }
              for(i=1;i>=10;i=i+1){
                 this.idade = 5;
+                this.dependentes[i] = "um dependente";
             }
 
-            return [3,1,4,a]; 
+            return [teste,teste,teste,teste]; 
         }
     }   
     constructor () {
@@ -94,7 +96,7 @@ class test{
             objects {
                 Pessoa pessoinha;
             }
-
+            return;
         }
     }
     constructor (int a, int b, bool c) {
