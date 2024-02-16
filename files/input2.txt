@@ -1,24 +1,70 @@
 const {
-    int sete = 4, oito = 25;
-    real um = 4, dois = 1.1;
-    string variavel="false", variavel2="4";
-    boolean teste = false;
-    boolean teste_2 = true;
+    real sete = 4.1;
+    string oito = "asd";
 }
 variables {
+    int a;
+    int b[2];
 }
-class main{
+
+class c1 {
+    variables{real v1;int v2;}
+    objects{c1 obj2;}
+    methods{
+        int m1(int v5, int v6, c1 c){
+            variables {
+                int v3;
+            }
+            objects {
+                c1 obj1;
+            }
+            obj1.obj2.v1 = obj1.v1 + 5.0;
+            return v6;
+        } 
+    }
+    constructor (int v, real j, c1 c) {
+        variables{}
+        objects{}
+    }
+}
+
+class c2 extends c1{
+    variables{int a;real b, c;}
+    objects{c1 c;}
+    methods{
+        int m2(){
+            variables {
+                int v5; int v6;
+            }
+            objects {
+              c1 obj2;
+            }
+            obj2->constructor(a,b,c);
+            a = 1 + obj2->m1(v5,v6,c);
+            return 1;
+        }
+    } 
+    constructor () {
+        variables{}
+        objects{}
+    }
+}
+
+class main {
     variables {
+        int v2;
     }
     objects {
+        c1 obj1;
     }
     methods{ 
-        void main(){
+        int main(){
             variables {
+                int v4;
             }
             objects {
             }
-            return;
+            return 1;
         } 
     }
 }

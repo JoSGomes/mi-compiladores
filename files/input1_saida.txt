@@ -371,4 +371,5 @@
 
 ############ !!! Erros encontrados !!! ############
 
+65. Tipo recebido incompatível: b
 65. Excesso de Parâmetros, quantidade esperada:  1
