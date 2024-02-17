@@ -1393,6 +1393,7 @@ class SintaxSemanticAnalizer():
                                     return
                         i += 1
                 else:
+                    i = 0
                     primaryType = None
                     objectType = None
                     for artifact in self.currentPathAttributeAccess:
@@ -1442,7 +1443,7 @@ class SintaxSemanticAnalizer():
         elif self.match('[', True, False):
             self._vectorAssignBlock()
             return
-        elif self.matchTokenType('IDE', True, False):
+        elif self.matchTokenType('IDE', True, False) or self.match('this', True, False):
             primaryType = self.getPrimaryTypeFromAllScopesFromPath(self.currentAttributeAccess, copy.deepcopy(self.currentPathAttributeAccess))
             if not self.ifConditionFlag:
                 self._initExpression(primaryType, returnDeFlag=returnDeFlag)
@@ -1531,8 +1532,9 @@ class SintaxSemanticAnalizer():
 
     def _simpleExpressionWithoutParentheses(self):
         self.loggerSintax.I("_simpleExpressionWithoutParentheses")
+        primaryType = self.getPrimaryTypeFromAllScopes(self.lookahead["value"])
         self.matchTokenType('NRO')
-        self._endExpression()
+        self._endExpression(primaryType)
 
     def _logicalExpressionWithoutParentheses(self):
         self.loggerSintax.I("_logicalExpressionWithoutParentheses")
@@ -1705,7 +1707,7 @@ class SintaxSemanticAnalizer():
                 else:
                     self.semanticErrorsHandler("INCOMPATIBLE")
             return
-        elif self.matchTokenType('IDE', True, False):
+        elif self.matchTokenType('IDE', True, False) or self.match('this', True, False):
             if self.relationExpression:
                 primaryTypeMustToBe = primaryType
                 self.currentAttributeAccess = None
@@ -1768,7 +1770,7 @@ class SintaxSemanticAnalizer():
                         elif objectType:
                             if artifact in self.globalScope[0][objectType]["variables"].keys():
                                 primaryType = self.globalScope[0][objectType]["variables"][artifact]
-                            elif artifact in self.globalScope[0][objectType]["objects"].key():
+                            elif artifact in self.globalScope[0][objectType]["objects"].keys():
                                 objectType = self.globalScope[0][objectType]["objects"][artifact]
                         
                         if primaryType:
@@ -1777,12 +1779,11 @@ class SintaxSemanticAnalizer():
                         i += 1
 
                 if not primaryTypeMustToBe == primaryType:
-                    self.semanticErrorsHandler("INCOMPATIBLE")
-                else:
-                    self.nextLookahead()
+                    self.saveSemanticError(incompatible, self.lookahead["value"], self.currentTokenLine)
+                    self.loggerSemantic.E(self.errors[-1])
 
             return
-        elif self.matchTokenType('CAC', True, True):
+        elif self.matchTokenType('CAC', True, False):
             if not primaryType == "string":
                 self.semanticErrorsHandler("INCOMPATIBLE")
             else:
@@ -1858,7 +1859,7 @@ class SintaxSemanticAnalizer():
                 self.match(['++', '--'])
             return
 
-    def _endExpression(self, primaryType: str):
+    def _endExpression(self, primaryType: str = None):
         self.loggerSintax.I("_endExpression")
         self.matchTokenType('ART')
         self._partLoop(primaryType)    
@@ -1935,7 +1936,7 @@ class SintaxSemanticAnalizer():
 
 
     def _return(self):      
-        if self.match(['[', '!', '('], True, False) or self.matchTokenType(['NRO', 'CAC', 'IDE'], True, False):
+        if self.match(['[', '!', '(', 'this'], True, False) or self.matchTokenType(['NRO', 'CAC', 'IDE'], True, False):
             returnFunction = False
             if re.match(pattern, self.lookahead["value"]):
                 returnFunction = True

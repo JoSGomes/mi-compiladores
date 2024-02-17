@@ -18,7 +18,7 @@ class c1 {
             objects {
                 c1 obj1;
             }
-            obj1.obj2.v1 = obj1.v1 + 5.0;
+            obj1.obj2.v1 = obj1.v1 + obj1.v1;
             return v6;
         } 
     }
@@ -29,7 +29,7 @@ class c1 {
 }
 
 class c2 extends c1{
-    variables{int a;real b, c;}
+    variables{int a;real b;}
     objects{c1 c;}
     methods{
         int m2(){
@@ -37,7 +37,6 @@ class c2 extends c1{
                 int v5; int v6;
             }
             objects {
-              c1 obj2;
             }
             obj2->constructor(a,b,c);
             a = 1 + obj2->m1(v5,v6,c);
